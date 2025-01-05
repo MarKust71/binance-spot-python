@@ -41,5 +41,7 @@ jobs:
     - name: Test with pytest
       env:
         API_WEBSOCKET_URL: ${{ secrets.API_WEBSOCKET_URL }}
+        API_KEY: ${{ secrets.API_KEY }}
+        API_SECRET: ${{ secrets.API_SECRET }}
       run: |
         pytest

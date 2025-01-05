@@ -23,6 +23,7 @@ def test_fetch_candles(mock_fetch_candles):
     candles = fetch_candles(TRADE_SYMBOL, KLINE_INTERVAL, 100)
     assert candles["close"][-1] == 300  # Oczekujemy, że ostatni close wynosi 300
 
+
 # Testowanie websocketu
 @patch("api.binance_websocket.ws_connect")
 def test_websocket_connection(mock_ws_connect):

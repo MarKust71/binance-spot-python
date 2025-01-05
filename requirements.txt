@@ -1,6 +1,6 @@
 python-binance
-numpy
 TA-Lib
+numpy
 websocket_client
 python-decouple
 pandas

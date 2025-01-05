@@ -1,1 +1,7 @@
+python-binance
+numpy
+TA-Lib
+ta-lib-python
+websocket_client
 python-decouple
+pandas

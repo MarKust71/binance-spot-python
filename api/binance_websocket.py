@@ -19,7 +19,7 @@ def on_message(ws, message):
     handle_message(message)
 
 
-def ws_connect(url, symbol, interval):
+def ws_kline(url, symbol, interval):
     socket = f"{url}/ws/{symbol.lower()}@kline_{interval}"
     print(socket)
 

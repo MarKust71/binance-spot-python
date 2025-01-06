@@ -21,7 +21,6 @@ def on_message(ws, message):
 
 def ws_connect(url, symbol, interval):
     socket = f"{url}/ws/{symbol.lower()}@kline_{interval}"
-    # socket = f"{url}/ws/{symbol.lower()}@ticker"
     print(socket)
 
     return websocket.WebSocketApp(socket, on_open=on_open, on_close=on_close, on_message=on_message, on_error=on_error)

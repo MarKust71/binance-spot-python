@@ -2,9 +2,8 @@ import pprint, talib, json
 
 import pandas as pd
 
-from constants import RSI_PERIOD, RSI_OVERBOUGHT, TRADE_VALUE, TRADE_SYMBOL, RSI_OVERSOLD, KLINE_INTERVAL, \
-    KLINE_TREND_INTERVAL
-from helpers import create_order, fetch_candles, determine_trend
+from constants import RSI_PERIOD, RSI_OVERBOUGHT, TRADE_VALUE, TRADE_SYMBOL, RSI_OVERSOLD, KLINE_INTERVAL
+from helpers import create_order, fetch_candles
 
 closes = []
 in_position = False
@@ -14,35 +13,22 @@ last_close = None
 def handle_message(message):
     global closes, in_position, last_close
 
-    # print('received message')
     json_message = json.loads(message)
-    # pprint.pprint(json_message)
 
     event_time = pd.to_datetime(json_message['E'], unit='ms')
 
     kline = json_message['k']
 
-    # print(event_time, kline['c'], kline['x'])
-    # pprint.pprint(kline)
-
     candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=100)
-    # rsi = talib.RSI(candles['close'].to_numpy())
-    # sma = talib.SMA(rsi, timeperiod=14)
-    # close_time = pd.to_datetime(numpy.array(candles['close_time'])[-1], unit='ms')
     close_time = pd.to_datetime(candles['close_time'].to_numpy()[-1], unit='ms')
-    # print(event_time, 'price:', candles['close'].to_numpy()[-1], '| RSI:', rsi[-1], '| SMA:', sma[-1])
 
     is_candle_closed = (close_time < event_time)
 
     if is_candle_closed and last_close != close_time:
         last_close = close_time
 
-        # trend = determine_trend(TRADE_SYMBOL, KLINE_TREND_INTERVAL)
-        # print('determine_trend:', trend.upper())
-
         rsi = talib.RSI(candles['close'].to_numpy())
         sma = talib.SMA(rsi, timeperiod=14)
-        # print(event_time, 'price:', candles['close'].to_numpy()[-1], '| RSI:', rsi[-1], '| SMA:', sma[-1])
 
         candle = {
             "timestamp": candles['timestamp'].to_numpy()[-2],

@@ -1,16 +1,15 @@
 import pprint, talib, json
-
 import pandas as pd
 
 from constants import RSI_PERIOD, RSI_OVERBOUGHT, TRADE_VALUE, TRADE_SYMBOL, RSI_OVERSOLD, KLINE_INTERVAL
-from helpers import create_order, fetch_candles
+from helpers import fetch_candles
 
 closes = []
 in_position = False
 last_close = None
 
 
-def handle_message(message):
+def handle_websocket_message(message):
     global closes, in_position, last_close
 
     json_message = json.loads(message)
@@ -18,9 +17,11 @@ def handle_message(message):
     event_time = pd.to_datetime(json_message['E'], unit='ms')
 
     kline = json_message['k']
+    # pprint.pprint(kline)
 
     candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=100)
     close_time = pd.to_datetime(candles['close_time'].to_numpy()[-1], unit='ms')
+    # pprint.pprint(candles.to_numpy()[-1])
 
     is_candle_closed = (close_time < event_time)
 
@@ -37,30 +38,27 @@ def handle_message(message):
             "sma": sma[-2]
         }
 
-        rsi_swing_high = (rsi[-1] < rsi[-2] and rsi[-2] > rsi[-3])
-        rsi_swing_low = (rsi[-1] < rsi[-2] and rsi[-2] < rsi[-3])
+        rsi_swing_high = rsi[-2] > rsi[-1] and rsi[-2] > rsi[-3]
+        rsi_swing_low = rsi[-2] < rsi[-1] and rsi[-2] < rsi[-3]
         rsi_swing = rsi_swing_high or rsi_swing_low
         rsi_signal_high = rsi[-2] > 70
         rsi_signal_low = rsi[-2] < 30
         rsi_signal = rsi_signal_high or rsi_signal_low
 
-        if rsi_swing_high and rsi_signal_high:
+        if (rsi_swing_high and rsi_signal_high) or (rsi_swing_low and rsi_signal_low):
             print('**', close_time)
-            print(candles['timestamp'].to_numpy()[-3], 'price:', candles['close'].to_numpy()[-3], '| RSI:', rsi[-3], '| SMA:', sma[-3])
-            print(candles['timestamp'].to_numpy()[-2], 'price:', candles['close'].to_numpy()[-2], '| RSI:', rsi[-2], '| SMA:', sma[-2])
-            print(candles['timestamp'].to_numpy()[-1], 'price:', candles['close'].to_numpy()[-1], '| RSI:', rsi[-1], '| SMA:', sma[-1])
-            print('   RSI swing HIGH:', rsi_swing_high, '| RSI signal HIGH:', rsi_signal_high)
+            for i in range(-3, 0):
+                print(candles['timestamp'].to_numpy()[i], 'price:', candles['close'].to_numpy()[i], '| RSI:', rsi[i], '| SMA:', sma[i])
+
+            if rsi_swing_high and rsi_signal_high:
+                print('   RSI swing HIGH:', rsi_swing_high, '| RSI signal HIGH:', rsi_signal_high)
+
+            if rsi_swing_low and rsi_signal_low:
+                print('   RSI swing LOW:', rsi_swing_low, '| RSI signal LOW:', rsi_signal_low)
+
             pprint.pprint(candle)
             print('\n')
 
-        if rsi_swing_low and rsi_signal_low:
-            print('**', close_time)
-            print(candles['timestamp'].to_numpy()[-3], 'price:', candles['close'].to_numpy()[-3], '| RSI:', rsi[-3], '| SMA:', sma[-3])
-            print(candles['timestamp'].to_numpy()[-2], 'price:', candles['close'].to_numpy()[-2], '| RSI:', rsi[-2], '| SMA:', sma[-2])
-            print(candles['timestamp'].to_numpy()[-1], 'price:', candles['close'].to_numpy()[-1], '| RSI:', rsi[-1], '| SMA:', sma[-1])
-            print('   RSI swing LOW:', rsi_swing_low, '| RSI signal LOW:', rsi_signal_low)
-            pprint.pprint(candle)
-            print('\n')
     else:
         last_close = None
 

@@ -1,4 +1,4 @@
-from api.binance_client import client
+from api import client
 import pandas as pd
 
 

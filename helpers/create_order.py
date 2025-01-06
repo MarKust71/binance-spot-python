@@ -1,4 +1,4 @@
-from api.binance_client import client
+from api import client
 from binance.enums import *
 
 
@@ -12,3 +12,6 @@ def create_order(side, quantity, symbol, order_type=ORDER_TYPE_MARKET):
         return False
 
     return True
+
+
+# print(create_order(side=SIDE_SELL, quantity=0.00055, symbol="BTCUSDT"))

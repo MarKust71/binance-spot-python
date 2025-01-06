@@ -1,5 +1,5 @@
-from helpers import fetch_candles
 from helpers.calculate_ema import calculate_ema
+from helpers.fetch_candles import fetch_candles
 
 
 def determine_trend(symbol, interval):

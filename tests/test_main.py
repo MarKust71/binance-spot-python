@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from unittest.mock import patch, MagicMock
 
-from helpers import fetch_candles
+from helpers.fetch_candles import fetch_candles
 from api.binance_websocket import ws_kline
 from constants import API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL
 

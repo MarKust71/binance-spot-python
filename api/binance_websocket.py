@@ -1,4 +1,4 @@
-from helpers import handle_message
+from api.handle_websocket_message import handle_websocket_message
 
 import websocket
 
@@ -16,7 +16,7 @@ def on_close(ws, status_code, close_msg):
 
 
 def on_message(ws, message):
-    handle_message(message)
+    handle_websocket_message(message)
 
 
 def ws_kline(url, symbol, interval):

@@ -1,9 +1,8 @@
 import ssl, talib
 
-# from binance import KLINE_INTERVAL_5MINUTE
-from api.binance_websocket import ws_kline
+from api import ws_kline
 from constants import API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL
-from helpers import fetch_candles, determine_trend
+from helpers import determine_trend, fetch_candles
 
 candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=100)
 timestamp = candles['timestamp'].to_numpy()[-1]

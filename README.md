@@ -7,3 +7,5 @@
     websocket-client: https://pypi.org/project/websocket-client/
     python-decouple: https://pypi.org/project/python-decouple/, https://github.com/HBNetwork/python-decouple
     pandas: https://pandas.pydata.org/
+
+pylint $(git ls-files '*.py')

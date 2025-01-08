@@ -1,10 +1,24 @@
+# helpers/determine_trend.py
+"""
+Determine trend module.
+"""
+
+
 import pprint
 
 from api.binance_client import client
-from constants import TRADE_SYMBOL
 
 
-def get_asset_balance(asset=None):
+def get_asset_balance(asset=None) -> dict:
+    """
+    This function does something.
+
+    Args:
+        asset: Description of param1.
+
+    Returns:
+        List of orders
+    """
     try:
         assets = client.get_asset_balance(asset=asset)
 
@@ -13,7 +27,7 @@ def get_asset_balance(asset=None):
     except Exception as e:
         print(f"Błąd podczas pobierania zleceń: {e}")
 
-    return None
+    return {}
 
 
 if __name__ == '__main__':

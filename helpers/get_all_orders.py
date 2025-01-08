@@ -1,10 +1,25 @@
+# helpers/determine_trend.py
+"""
+Determine trend module.
+"""
+
+
 import pprint
 
 from api import client
 from constants import TRADE_SYMBOL
 
 
-def get_all_orders(symbol):
+def get_all_orders(symbol) -> list:
+    """
+    This function does something.
+
+    Args:
+        symbol: Description of param1.
+
+    Returns:
+        List of orders
+    """
     try:
         orders = client.get_all_orders(symbol=symbol)
 
@@ -13,7 +28,7 @@ def get_all_orders(symbol):
     except Exception as e:
         print(f"Błąd podczas pobierania zleceń: {e}")
 
-    return None
+    return []
 
 
 if __name__ == '__main__':

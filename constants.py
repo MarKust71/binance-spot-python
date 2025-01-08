@@ -1,5 +1,12 @@
+# helpers/determine_trend.py
+"""
+Determine trend module.
+"""
+
+
 from decouple import config
-from binance.enums import *
+# from binance.enums import *
+from binance.enums import KLINE_INTERVAL_1MINUTE, KLINE_INTERVAL_5MINUTE
 
 API_WEBSOCKET_URL = config('API_WEBSOCKET_URL')
 
@@ -13,4 +20,3 @@ TRADE_QUANTITY = 0.05
 
 KLINE_INTERVAL = KLINE_INTERVAL_1MINUTE
 KLINE_TREND_INTERVAL = KLINE_INTERVAL_5MINUTE
-

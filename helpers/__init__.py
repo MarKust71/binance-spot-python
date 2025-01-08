@@ -1,3 +1,9 @@
+# helpers/__init__.py
+"""
+Helpers module initialization.
+"""
+
+
 # from .calculate_ema import calculate_ema
 # from .create_order import create_order
 from .determine_trend import determine_trend

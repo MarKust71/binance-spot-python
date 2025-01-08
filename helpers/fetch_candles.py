@@ -1,9 +1,27 @@
-from api import client
+# helpers/determine_trend.py
+"""
+Determine trend module.
+"""
+
+
 import pandas as pd
+
+from api import client
 
 
 # Funkcja pobierania danych świecowych
-def fetch_candles(symbol, interval, limit=100):
+def fetch_candles(symbol, interval, limit=100) -> pd.DataFrame:
+    """
+    This function does something.
+
+    Args:
+        symbol: Description of param1.
+        interval: Description of param1.
+        limit: Description of param1.
+
+    Returns:
+        Trend direction
+    """
     try:
         candles = client.get_klines(symbol=symbol, interval=interval, limit=limit)
 
@@ -20,5 +38,4 @@ def fetch_candles(symbol, interval, limit=100):
     except Exception as e:
         print(f"Błąd podczas pobierania świec: {e}")
 
-        return None
-
+        return pd.DataFrame()

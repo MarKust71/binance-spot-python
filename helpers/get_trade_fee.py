@@ -1,10 +1,25 @@
+# helpers/determine_trend.py
+"""
+Determine trend module.
+"""
+
+
 import pprint
 
 from api.binance_client import client
 from constants import TRADE_SYMBOL
 
 
-def get_trade_fee(symbol=None):
+def get_trade_fee(symbol=None) -> list:
+    """
+    This function does something.
+
+    Args:
+        symbol: Description of param1.
+
+    Returns:
+        Fees' definitions
+    """
     try:
         fee = client.get_trade_fee(symbol=symbol)
 
@@ -13,7 +28,7 @@ def get_trade_fee(symbol=None):
     except Exception as e:
         print(f"Błąd podczas pobierania opłat: {e}")
 
-    return None
+    return []
 
 
 if __name__ == '__main__':

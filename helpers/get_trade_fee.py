@@ -15,4 +15,6 @@ def get_trade_fee(symbol=None):
 
     return None
 
-# pprint.pprint(get_trade_fee(TRADE_SYMBOL))
+
+if __name__ == '__main__':
+    pprint.pprint(get_trade_fee(symbol=TRADE_SYMBOL))

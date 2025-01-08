@@ -58,6 +58,9 @@ def handle_websocket_message(message):
 
             pprint.pprint(candle)
             print('\n')
+        else:
+            print(candles['timestamp'].to_numpy()[-1], 'price:', candles['close'].to_numpy()[-1], '| RSI:', rsi[-1], '| SMA:', sma[-1], '| RSI swing:', rsi_swing)
+
 
     else:
         last_close = None

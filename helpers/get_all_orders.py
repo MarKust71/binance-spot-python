@@ -15,4 +15,6 @@ def get_all_orders(symbol):
 
     return None
 
-pprint.pprint(get_all_orders(symbol=TRADE_SYMBOL))
+
+if __name__ == '__main__':
+    pprint.pprint(get_all_orders(symbol=TRADE_SYMBOL))

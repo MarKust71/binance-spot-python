@@ -15,6 +15,8 @@ def get_asset_balance(asset=None):
 
     return None
 
-# pprint.pprint(get_asset_balance(asset='USDT'))
-# pprint.pprint(get_asset_balance(asset='ETH'))
-# pprint.pprint(get_asset_balance(asset='BTC'))
+
+if __name__ == '__main__':
+    pprint.pprint(get_asset_balance(asset='USDT'))
+    pprint.pprint(get_asset_balance(asset='ETH'))
+    pprint.pprint(get_asset_balance(asset='BTC'))

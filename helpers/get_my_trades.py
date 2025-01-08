@@ -15,4 +15,6 @@ def get_my_trades(symbol):
 
     return None
 
-# pprint.pprint(get_my_trades(symbol=TRADE_SYMBOL))
+
+if __name__ == '__main__':
+    pprint.pprint(get_my_trades(symbol=TRADE_SYMBOL))

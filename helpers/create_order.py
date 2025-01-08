@@ -14,4 +14,5 @@ def create_order(side, quantity, symbol, order_type=ORDER_TYPE_MARKET):
     return True
 
 
-# print(create_order(side=SIDE_SELL, quantity=0.00055, symbol="BTCUSDT"))
+if __name__ == '__main__':
+    print(create_order(side=SIDE_BUY, quantity=0.00055, symbol="BTCUSDT"))

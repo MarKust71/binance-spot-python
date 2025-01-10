@@ -7,7 +7,7 @@ Binance websocket module.
 import websocket
 
 from websocket import WebSocketApp
-from api.handle_websocket_message import handle_websocket_message
+from api_websocket.handle_websocket_message import handle_websocket_message
 
 
 def on_error(ws, error) -> None:

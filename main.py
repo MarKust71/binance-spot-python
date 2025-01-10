@@ -7,7 +7,7 @@ Determine trend module.
 import ssl
 import talib
 
-from api import ws_kline
+from api_websocket import ws_kline
 from constants import API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL
 from helpers import determine_trend, fetch_candles
 

@@ -2,8 +2,7 @@
 """
 Determine trend module.
 """
-
-
+from constants import BULLISH, BEARISH
 from helpers.calculate_ema import calculate_ema
 from helpers.fetch_candles import fetch_candles
 
@@ -25,8 +24,8 @@ def determine_trend(symbol, interval) -> str:
         data_frame['ema_50'] = calculate_ema(data_frame['close'], 50)
         data_frame['ema_200'] = calculate_ema(data_frame['close'], 200)
         if data_frame['ema_50'].iloc[-1] > data_frame['ema_200'].iloc[-1]:
-            return "bullish"  # Trend wzrostowy
+            return BULLISH  # Trend wzrostowy
         if data_frame['ema_50'].iloc[-1] < data_frame['ema_200'].iloc[-1]:
-            return "bearish"  # Trend spadkowy
+            return BEARISH  # Trend spadkowy
 
     return ''

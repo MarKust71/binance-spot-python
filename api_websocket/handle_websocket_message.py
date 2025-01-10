@@ -9,12 +9,11 @@ import json
 import talib
 import pandas as pd
 
-from constants import TRADE_SYMBOL, KLINE_INTERVAL
-from helpers import fetch_candles
+from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL, BULLISH, BEARISH
+from helpers import fetch_candles, determine_trend
 
 # closes = []
 # IN_POSITION = False
-# LAST_CLOSE = None
 
 LAST_CLOSE = None
 
@@ -35,6 +34,7 @@ def handle_websocket_message(message) -> None:
     event_time = pd.to_datetime(json_message['E'], unit='ms')
     # kline = json_message['k']
 
+    trend = determine_trend(TRADE_SYMBOL, KLINE_TREND_INTERVAL)
     candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=100)
     close_time = pd.to_datetime(candles['close_time'].to_numpy()[-1], unit='ms')
     is_candle_closed = close_time < event_time
@@ -55,15 +55,16 @@ def handle_websocket_message(message) -> None:
         rsi_signals = {
             "swing_high": rsi[-2] > rsi[-1] and rsi[-2] > rsi[-3],
             "swing_low": rsi[-2] < rsi[-1] and rsi[-2] < rsi[-3],
-            "signal_high": rsi[-2] > 70,
-            "signal_low": rsi[-2] < 30
+            "signal_high": rsi[-1] > 70,
+            "signal_low": rsi[-1] < 30
         }
         rsi_signals["swing"] = rsi_signals["swing_high"] or rsi_signals["swing_low"]
         rsi_signals["signal"] = rsi_signals["signal_high"] or rsi_signals["signal_low"]
 
         if ((rsi_signals["swing_high"] and rsi_signals["signal_high"])
                 or (rsi_signals["swing_low"] and rsi_signals["signal_low"])):
-            print('**', close_time)
+            print('\n**', close_time)
+            print('determine_trend:', trend.upper())
             for i in range(-3, 0):
                 print(candles['timestamp'].to_numpy()[i], 'price:',
                       candles['close'].to_numpy()[i], '| RSI:', rsi[i], '| SMA:', sma[i])
@@ -77,7 +78,14 @@ def handle_websocket_message(message) -> None:
                       rsi_signals["signal_low"])
 
             pprint.pprint(candle)
-            print('\n')
+
+            if rsi_signals["swing_high"] and rsi_signals["signal_high"] and trend == BEARISH:
+                print('SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL')
+
+            if rsi_signals["swing_low"] and rsi_signals["signal_low"] and trend == BULLISH:
+                print('BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY')
+
+            # print('\n')
         else:
             print(candles['timestamp'].to_numpy()[-1], 'price:',
                   candles['close'].to_numpy()[-1], '| RSI:',

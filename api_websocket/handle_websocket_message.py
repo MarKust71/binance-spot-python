@@ -7,10 +7,12 @@ Binance handle websocket message module.
 import json
 import talib
 import pandas as pd
+from binance import SIDE_SELL, SIDE_BUY
 
 from constants import TRADE_SYMBOL, KLINE_INTERVAL, TRADE_SIGNAL_NONE, \
-    TRADE_SIGNAL_SELL, TRADE_SIGNAL_BUY
+    TRADE_SIGNAL_SELL, TRADE_SIGNAL_BUY, TRADE_VALUE
 from helpers import fetch_candles, determine_trend, get_rsi_signals, get_trade_signal
+from helpers.create_order import create_order
 
 # closes = []
 # IN_POSITION = False
@@ -57,13 +59,18 @@ def handle_websocket_message(message) -> None:
         trade_signal = get_trade_signal(rsi_signals, trend, candles, rsi, sma, candle)
 
         if trade_signal != TRADE_SIGNAL_NONE:
+            quantity = round(TRADE_VALUE / float(candle['close']), 6)
+            order_succeeded = None
+
             if trade_signal == TRADE_SIGNAL_SELL:
                 print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
+                order_succeeded = create_order(SIDE_SELL, quantity, TRADE_SYMBOL)
 
             if trade_signal == TRADE_SIGNAL_BUY:
                 print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')
+                order_succeeded = create_order(SIDE_BUY, quantity, TRADE_SYMBOL)
 
-            print('\n')
+            print(f'Orders succeeded: {order_succeeded}\n')
 
         else:
             print(candles['timestamp'].to_numpy()[-1], 'price:',

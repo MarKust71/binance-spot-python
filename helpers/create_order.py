@@ -5,8 +5,10 @@ Create order module.
 
 
 # from binance.enums import *
-from binance.enums import ORDER_TYPE_MARKET, SIDE_BUY
+from binance.enums import ORDER_TYPE_MARKET, SIDE_SELL
 from api import client
+from constants import TRADE_SYMBOL
+
 
 def create_order(side, quantity, symbol, order_type=ORDER_TYPE_MARKET) -> bool:
     """
@@ -26,7 +28,6 @@ def create_order(side, quantity, symbol, order_type=ORDER_TYPE_MARKET) -> bool:
         order = client.create_order(symbol=symbol, side=side, type=order_type, quantity=quantity)
         print(order)
     except Exception as e:
-        # print("an exception occurred - {}".format(e))
         print(f"an exception occurred - {format(e)}")
         return False
 
@@ -34,4 +35,4 @@ def create_order(side, quantity, symbol, order_type=ORDER_TYPE_MARKET) -> bool:
 
 
 if __name__ == '__main__':
-    print(create_order(side=SIDE_BUY, quantity=0.00055, symbol="BTCUSDT"))
+    print(create_order(side=SIDE_SELL, quantity=0.0061, symbol=TRADE_SYMBOL))

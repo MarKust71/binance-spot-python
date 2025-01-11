@@ -31,6 +31,7 @@ def fetch_candles(symbol, interval, limit=100) -> pd.DataFrame:
             'taker_buy_base_volume', 'taker_buy_quote_volume', 'ignore'
         ])
         data_frame['timestamp'] = pd.to_datetime(data_frame['timestamp'], unit='ms')
+        data_frame['close_time'] = pd.to_datetime(data_frame['close_time'], unit='ms')
         data_frame['close'] = data_frame['close'].astype(float)
 
         return data_frame

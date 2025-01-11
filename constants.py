@@ -1,6 +1,6 @@
-# helpers/determine_trend.py
+# helpers/constants.py
 """
-Determine trend module.
+App constants module.
 """
 
 
@@ -24,3 +24,16 @@ KLINE_TREND_INTERVAL = KLINE_INTERVAL_5MINUTE
 # Trend
 BULLISH = "bullish"
 BEARISH = "bearish"
+
+# Swing
+SWING_HIGH = "swing_high"
+SWING_LOW = "swing_low"
+
+# Signal
+SIGNAL_HIGH = "signal_high"
+SIGNAL_LOW = "signal_low"
+
+# Trade signals
+TRADE_SIGNAL_BUY = "buy"
+TRADE_SIGNAL_SELL = "sell"
+TRADE_SIGNAL_NONE = "none"

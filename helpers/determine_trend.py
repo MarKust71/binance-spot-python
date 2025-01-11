@@ -2,12 +2,13 @@
 """
 Determine trend module.
 """
+
+
 from constants import BULLISH, BEARISH
 from helpers.calculate_ema import calculate_ema
-from helpers.fetch_candles import fetch_candles
 
 
-def determine_trend(symbol, interval) -> str:
+def determine_trend(data_frame) -> str:
     """
     This function does something.
 
@@ -18,7 +19,7 @@ def determine_trend(symbol, interval) -> str:
     Returns:
         Trend direction
     """
-    data_frame = fetch_candles(symbol, interval)
+
 
     if data_frame is not None:
         data_frame['ema_50'] = calculate_ema(data_frame['close'], 50)

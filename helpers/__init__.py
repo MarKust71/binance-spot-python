@@ -14,3 +14,5 @@ from .fetch_candles import fetch_candles
 # from .get_open_orders import get_open_orders
 # from .get_trade_fee import get_trade_fee
 # from .handle_message import handle_message
+from .get_rsi_signals import get_rsi_signals
+from .get_trade_signal import get_trade_signal

@@ -15,7 +15,7 @@ def get_trade_signal(rsi_signals, trend, data, rsi, sma, candle):
     """
     Get trade signal based on RSI signal and trend.
 
-    :param rsi_signal: dict: RSI signal.
+    :param rsi_signals: dict: RSI signal.
     :param trend: str: Trend.
     :param data: pandas.DataFrame: Data.
     :param rsi: numpy.ndarray: RSI.

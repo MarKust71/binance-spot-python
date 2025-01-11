@@ -13,8 +13,7 @@ def determine_trend(data_frame) -> str:
     This function does something.
 
     Args:
-        symbol: Description of param1.
-        interval: Description of param1.
+        data_frame: Description of param1.
 
     Returns:
         Trend direction

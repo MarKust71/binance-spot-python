@@ -10,7 +10,7 @@ from api import client
 
 
 # Funkcja pobierania danych świecowych
-def fetch_candles(symbol, interval, limit=100) -> pd.DataFrame:
+def fetch_candles(symbol, interval, limit=200) -> pd.DataFrame:
     """
     This function does something.
 

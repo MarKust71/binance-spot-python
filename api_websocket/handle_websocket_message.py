@@ -10,8 +10,9 @@ import pandas as pd
 from binance import SIDE_SELL, SIDE_BUY
 
 from constants import TRADE_SYMBOL, KLINE_INTERVAL, TRADE_SIGNAL_NONE, \
-    TRADE_SIGNAL_SELL, TRADE_SIGNAL_BUY, TRADE_VALUE
+    TRADE_SIGNAL_SELL, TRADE_SIGNAL_BUY, TRADE_VALUE, KLINE_TREND_INTERVAL
 from helpers import fetch_candles, determine_trend, get_rsi_signals, get_trade_signal
+from helpers.calculate_ema import calculate_ema
 from helpers.create_order import create_order
 
 # closes = []
@@ -36,8 +37,10 @@ def handle_websocket_message(message) -> None:
     event_time = pd.to_datetime(json_message['E'], unit='ms')
     # kline = json_message['k']
 
-    candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=100)
-    trend = determine_trend(candles)
+    trend_candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=200)
+    trend = determine_trend(trend_candles)
+
+    candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=200)
     close_time = pd.to_datetime(candles['close_time'].to_numpy()[-1], unit='ms')
     is_candle_closed = close_time < event_time
 
@@ -59,7 +62,7 @@ def handle_websocket_message(message) -> None:
         trade_signal = get_trade_signal(rsi_signals, trend, candles, rsi, sma, candle)
 
         if trade_signal != TRADE_SIGNAL_NONE:
-            quantity = round(TRADE_VALUE / float(candle['close']), 6)
+            quantity = round(TRADE_VALUE / float(candle['close']), 4)
             order_succeeded = None
 
             if trade_signal == TRADE_SIGNAL_SELL:
@@ -70,16 +73,18 @@ def handle_websocket_message(message) -> None:
                 print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')
                 order_succeeded = create_order(SIDE_BUY, quantity, TRADE_SYMBOL)
 
-            print(f'Orders succeeded: {order_succeeded}\n')
+            print(f'Order succeeded: {order_succeeded}\n')
 
         else:
-            print(candles['timestamp'].to_numpy()[-1], 'price:',
-                  candles['close'].to_numpy()[-1], '| RSI:',
-                  rsi[-1], '| SMA:', sma[-1], '| RSI swing:',
-                  rsi_signals["swing"], '| RSI signal:', rsi_signals["signal"])
-
-    else:
-        LAST_CLOSE = None
+            print(candles['timestamp'].iloc[-1].strftime('%Y-%m-%d %H:%M:%S'), f'| price: {candles['close'].to_numpy()[-1]:,.2f}',
+            # print(candles['timestamp'].to_numpy()[-1], f'price: {candles['close'].to_numpy()[-1]:,.2f}',
+            # print(candles['timestamp'].to_numpy()[-1], f'price: {candles['close'].to_numpy()[-1]:,.2f}',
+                f'| RSI: {rsi[-1]:,.2f}',
+                f'| SMA: {sma[-1]:,.2f}', '| RSI swing:',
+                rsi_signals["swing"], '| RSI signal:', rsi_signals["signal"],
+                '| Trend:', trend.upper(),
+                f'| EMA50: {calculate_ema(trend_candles['close'], 50).iloc[-1]:,.2f}',
+                f'| EMA200: {calculate_ema(trend_candles['close'], 200).iloc[-1]:,.2f}')
 
 
 # def handle_websocket_message(message):

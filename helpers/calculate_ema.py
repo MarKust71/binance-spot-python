@@ -5,7 +5,7 @@ Calculate EMA module.
 
 
 # Funkcja obliczania EMA
-def calculate_ema(series, period) -> float:
+def calculate_ema(series, period):
     """
     This function does something.
 
@@ -14,6 +14,6 @@ def calculate_ema(series, period) -> float:
         period: Description of param1.
 
     Returns:
-        EMA value
+        EMA value data frame
     """
     return series.ewm(span=period, adjust=False).mean()

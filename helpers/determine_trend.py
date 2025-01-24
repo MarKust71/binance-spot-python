@@ -21,8 +21,9 @@ def determine_trend(data_frame) -> str:
 
 
     if data_frame is not None:
-        data_frame.loc[:, 'ema_50'] = calculate_ema(data_frame['close'], 50)
-        data_frame.loc[:, 'ema_200'] = calculate_ema(data_frame['close'], 200)
+        data_frame = data_frame.copy()  # Ensure we are working with a copy
+        data_frame.loc[:, ('ema_50')] = calculate_ema(data_frame['close'], 50)
+        data_frame.loc[:, ('ema_200')] = calculate_ema(data_frame['close'], 200)
 
         if data_frame['ema_50'].iloc[-1] > data_frame['ema_200'].iloc[-1]:
             return BULLISH  # Trend wzrostowy

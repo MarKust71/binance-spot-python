@@ -35,4 +35,4 @@ def create_order(side, quantity, symbol, order_type=ORDER_TYPE_MARKET) -> bool:
 
 
 if __name__ == '__main__':
-    print(create_order(side=SIDE_BUY, quantity=0.0059, symbol=TRADE_SYMBOL))
+    print(create_order(side=SIDE_BUY, quantity=0.0061, symbol=TRADE_SYMBOL))

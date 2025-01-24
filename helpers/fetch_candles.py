@@ -32,7 +32,11 @@ def fetch_candles(symbol, interval, limit=200) -> pd.DataFrame:
         ])
         data_frame['timestamp'] = pd.to_datetime(data_frame['timestamp'], unit='ms')
         data_frame['close_time'] = pd.to_datetime(data_frame['close_time'], unit='ms')
+        data_frame['open'] = data_frame['open'].astype(float)
+        data_frame['high'] = data_frame['high'].astype(float)
+        data_frame['low'] = data_frame['low'].astype(float)
         data_frame['close'] = data_frame['close'].astype(float)
+        data_frame['volume'] = data_frame['volume'].astype(float)
 
         return data_frame
 

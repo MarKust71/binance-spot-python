@@ -35,8 +35,6 @@ trend_candles.to_csv('trend_candles.csv')
 for i in range(0, len(candles) - SCOPE + 1):
 
     data = candles.iloc[:SCOPE + i]
-    rsi = talib.RSI(data['close'].to_numpy())
-    sma = talib.SMA(rsi, timeperiod=14)
 
     trend_data = trend_candles[
         trend_candles['timestamp']

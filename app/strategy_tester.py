@@ -4,7 +4,6 @@ Strategy tester module.
 """
 
 import pandas as pd
-import talib
 
 from constants import TRADE_SYMBOL, KLINE_INTERVAL, \
     TRADE_SIGNAL_SELL, TRADE_SIGNAL_BUY, TRADE_SIGNAL_NONE, KLINE_TREND_INTERVAL
@@ -14,7 +13,7 @@ LIMIT=1000
 SCOPE=2
 TREND_LIMIT=1000
 FRACTALS_PERIODS=20
-DELAY=5
+DELAY=0
 
 candles = fetch_candles(
     symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, endTime=None
@@ -40,11 +39,9 @@ for i in range(0, len(candles) - SCOPE + 1):
         trend_candles['timestamp']
         <= data['timestamp'].iloc[-1] - pd.Timedelta(minutes=DELAY * FRACTALS_PERIODS)
     ]
-    atr = talib.ATR(trend_data['high'].to_numpy(), trend_data['low'].to_numpy(),
-                    trend_data['close'].to_numpy(), timeperiod=14)
     trend_data=set_fractals(trend_data, periods=FRACTALS_PERIODS)
 
-    trend = determine_trend(trend_data)
+    trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS])
     trade_signal = get_trade_signal(trend, data)
 
     if trade_signal != TRADE_SIGNAL_NONE:
@@ -52,11 +49,28 @@ for i in range(0, len(candles) - SCOPE + 1):
             trend_data['Fractal_Up'].notnull()
             | trend_data['Fractal_Down'].notnull()
         ][['timestamp', 'Fractal_Down', 'Fractal_Up']]
+        print('fractals:')
         print(fractals[
                   fractals['Fractal_Up'].notnull() | fractals['Fractal_Down'].notnull()
               ][['timestamp', 'Fractal_Down', 'Fractal_Up']].tail(5))
 
+        # print('ATR:', trend_data['timestamp'].iloc[-1].strftime('%Y-%m-%d %H:%M:%S'),
+        #       f'| price: {trend_data['close'].to_numpy()[-1]:,.2f}',
+        #       f'| RSI: {trend_data['rsi'].to_numpy()[-1]:,.2f}',
+        #       f'| SMA: {trend_data['sma'].to_numpy()[-1]:,.2f}',
+        #       f'| ATR: {trend_data['atr'].to_numpy()[-1]:,.2f}')
+
+        # print('data:')
+        # print(data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(5))
+        # print('trend_data:')
+        # print(trend_data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(5))
+        print('trend_data:')
+        print(trend_data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(1))
+
         print('timestamp:', data['timestamp'].iloc[-1])
+
+        if trade_signal != TRADE_SIGNAL_NONE:
+            print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
 
         if trade_signal == TRADE_SIGNAL_SELL:
             print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')

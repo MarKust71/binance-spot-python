@@ -4,9 +4,11 @@ Strategy tester module.
 """
 
 import pandas as pd
+import numpy as np
 
 from constants import TRADE_SYMBOL, KLINE_INTERVAL, \
     TRADE_SIGNAL_SELL, TRADE_SIGNAL_BUY, TRADE_SIGNAL_NONE, KLINE_TREND_INTERVAL
+from db import TradeRepository, Side
 from helpers import (determine_trend, fetch_candles, get_trade_signal, set_fractals)
 
 LIMIT=1000
@@ -30,6 +32,7 @@ trend_candles = fetch_candles(
 # candles.to_csv('candles.csv')
 # trend_candles.to_csv('trend_candles.csv')
 
+repo = TradeRepository()
 
 for i in range(0, len(candles) - SCOPE + 1):
 
@@ -73,9 +76,23 @@ for i in range(0, len(candles) - SCOPE + 1):
             print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
 
         if trade_signal == TRADE_SIGNAL_SELL:
+            repo.add_trade(
+                date_time=data['timestamp'].iloc[-1],
+                symbol=TRADE_SYMBOL,
+                side=Side.SELL,
+                price=data["close"].to_numpy()[-1],
+                atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
+            )
             print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
 
         if trade_signal == TRADE_SIGNAL_BUY:
+            repo.add_trade(
+                date_time=data['timestamp'].iloc[-1],
+                symbol=TRADE_SYMBOL,
+                side=Side.BUY,
+                price=data["close"].to_numpy()[-1],
+                atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
+            )
             print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')
 
         print('\n')
@@ -91,6 +108,19 @@ for i in range(0, len(candles) - SCOPE + 1):
     # #           f'| EMA200: {calculate_ema(trend_data['close'], 200).iloc[-1]:,.2f}'
     #           )
 
+repo.close()
 
 if __name__ == '__main__':
     pass
+
+    # repo = TradeRepository()
+    #
+    # # Dodanie przykładowej transakcji
+    # repo.add_trade(symbol="ETHUSDT", side=Side.BUY, price=3125.50, atr=8.8)
+    #
+    # # Pobranie i wyświetlenie transakcji
+    # trades = repo.get_all_trades()
+    # for trade in trades:
+    #     print(trade)
+    #
+    # repo.close()

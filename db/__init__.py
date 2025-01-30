@@ -4,4 +4,5 @@ Database module initialization.
 """
 
 
-from .database import Base, engine
+from .database import Base, engine, SessionLocal, Side, Trades
+from .trade_repository import TradeRepository

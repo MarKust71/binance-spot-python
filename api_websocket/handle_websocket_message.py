@@ -50,12 +50,6 @@ def handle_websocket_message(message) -> None:
         rsi = talib.RSI(candles['close'].to_numpy())
         sma = talib.SMA(rsi, timeperiod=14)
 
-        # candle = {
-        #     "timestamp": candles['timestamp'].to_numpy()[-2],
-        #     "close": candles['close'].to_numpy()[-2],
-        #     "rsi": rsi[-2],
-        #     "sma": sma[-2]
-        # }
         candle = {
             "timestamp": candles['timestamp'].to_numpy()[-1],
             "close": candles['close'].to_numpy()[-1],
@@ -65,8 +59,7 @@ def handle_websocket_message(message) -> None:
 
         rsi_signals = get_rsi_signals(rsi)
 
-        # trade_signal = get_trade_signal(rsi_signals, trend, candles, rsi, sma, candle)
-        trade_signal = get_trade_signal(rsi_signals, trend, candles, rsi, sma)
+        trade_signal = get_trade_signal(trend, candles)
 
         if trade_signal != TRADE_SIGNAL_NONE:
             quantity = round(TRADE_VALUE / float(candle['close']), 4)

@@ -4,8 +4,6 @@ Get trade signal module.
 """
 
 
-import pprint
-
 from constants import TRADE_SIGNAL_BUY, SWING_HIGH, SIGNAL_HIGH, TREND_BEARISH, \
     TRADE_SIGNAL_SELL, SWING_LOW, SIGNAL_LOW, \
     TREND_BULLISH, TRADE_SIGNAL_NONE

@@ -28,8 +28,8 @@ trend_candles = fetch_candles(
 # print(fr)
 # fr.to_csv('fractals.csv')
 
-candles.to_csv('candles.csv')
-trend_candles.to_csv('trend_candles.csv')
+# candles.to_csv('candles.csv')
+# trend_candles.to_csv('trend_candles.csv')
 
 
 for i in range(0, len(candles) - SCOPE + 1):

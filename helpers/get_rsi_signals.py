@@ -4,9 +4,7 @@ Calculate RSI signals module.
 """
 
 
-import talib
-
-def get_rsi_signals(rsi: talib.RSI) -> dict:
+def get_rsi_signals(rsi: list) -> dict:
     rsi_signals = {
         "swing_high": rsi[-2] > rsi[-1] and rsi[-2] > rsi[-3],
         "swing_low": rsi[-2] < rsi[-1] and rsi[-2] < rsi[-3],

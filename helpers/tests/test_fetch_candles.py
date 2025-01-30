@@ -34,7 +34,7 @@ class TestFetchCandles(unittest.TestCase):
              1609462800000, "29000000", 100, "500", "14500000", "0"]
         ]
 
-        result = fetch_candles('BTCUSDT', '1h', 1)
+        result = fetch_candles('BTCUSDT', '1h', 1, endTime=None)
         self.assertIsNotNone(result)
         self.assertIsInstance(result, pd.DataFrame)
         self.assertEqual(result['timestamp'][0], pd.to_datetime(1609459200000, unit='ms'))
@@ -55,7 +55,7 @@ class TestFetchCandles(unittest.TestCase):
         # Simulate an exception
         mock_get_klines.side_effect = Exception("API error")
 
-        result = fetch_candles('BTCUSDT', '1h', 1)
+        result = fetch_candles('BTCUSDT', '1h', 1, endTime=None)
         self.assertIsNone(result)
 
 if __name__ == '__main__':

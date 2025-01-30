@@ -16,3 +16,4 @@ from .fetch_candles import fetch_candles
 # from .handle_message import handle_message
 from .get_rsi_signals import get_rsi_signals
 from .get_trade_signal import get_trade_signal
+from .set_fractals import set_fractals

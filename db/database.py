@@ -38,23 +38,25 @@ Base.metadata.create_all(bind=engine)
 if __name__ == '__main__':
     pass
 
-    # # Tworzenie sesji
-    # session = SessionLocal()
-    #
-    # # Przykładowe dane do dodania
-    # new_trade = Trades(
-    #     timestamp=datetime.now(),  # Obecny czas
-    #     symbol="BTCUSDT",          # Przykładowy symbol
-    #     side=Side.BUY,             # Strona transakcji (BUY/SELL)
-    #     price=43125.50             # Przykładowa cena
-    # )
-    # session.add(new_trade)
-    # session.commit()
-    #
-    # # Pobieranie użytkownika
-    # trades = session.query(Trades).all()
-    # for trade in trades:
-    #     print(trade)
-    #
-    # # Zamknięcie sesji
-    # session.close()
+    # Przykładowe dane do dodania
+    new_trade = Trades(
+        timestamp=datetime.now(),  # Obecny czas
+        symbol="BTCUSDT",          # Przykładowy symbol
+        side=Side.BUY,             # Strona transakcji (BUY/SELL)
+        price=43125.50             # Przykładowa cena
+    )
+
+    if new_trade.price > 0:
+        # Tworzenie sesji
+        session = SessionLocal()
+
+        session.add(new_trade)
+        session.commit()
+
+        # Pobieranie użytkownika
+        trades = session.query(Trades).all()
+        for trade in trades:
+            print(trade)
+
+        # Zamknięcie sesji
+        session.close()

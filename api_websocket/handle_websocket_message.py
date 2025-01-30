@@ -37,10 +37,10 @@ def handle_websocket_message(message) -> None:
     event_time = pd.to_datetime(json_message['E'], unit='ms')
     # kline = json_message['k']
 
-    trend_candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=200)
+    trend_candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=200, endTime=None)
     trend = determine_trend(trend_candles)
 
-    candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=200)
+    candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=200, endTime=None)
     close_time = pd.to_datetime(candles['close_time'].to_numpy()[-1], unit='ms')
     is_candle_closed = close_time < event_time
 
@@ -50,16 +50,23 @@ def handle_websocket_message(message) -> None:
         rsi = talib.RSI(candles['close'].to_numpy())
         sma = talib.SMA(rsi, timeperiod=14)
 
+        # candle = {
+        #     "timestamp": candles['timestamp'].to_numpy()[-2],
+        #     "close": candles['close'].to_numpy()[-2],
+        #     "rsi": rsi[-2],
+        #     "sma": sma[-2]
+        # }
         candle = {
-            "timestamp": candles['timestamp'].to_numpy()[-2],
-            "close": candles['close'].to_numpy()[-2],
-            "rsi": rsi[-2],
-            "sma": sma[-2]
+            "timestamp": candles['timestamp'].to_numpy()[-1],
+            "close": candles['close'].to_numpy()[-1],
+            "rsi": rsi[-1],
+            "sma": sma[-1]
         }
 
         rsi_signals = get_rsi_signals(rsi)
 
-        trade_signal = get_trade_signal(rsi_signals, trend, candles, rsi, sma, candle)
+        # trade_signal = get_trade_signal(rsi_signals, trend, candles, rsi, sma, candle)
+        trade_signal = get_trade_signal(rsi_signals, trend, candles, rsi, sma)
 
         if trade_signal != TRADE_SIGNAL_NONE:
             quantity = round(TRADE_VALUE / float(candle['close']), 4)
@@ -97,7 +104,7 @@ def handle_websocket_message(message) -> None:
 #     kline = json_message['k']
 #     # pprint.pprint(kline)
 #
-#     candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=100)
+#     candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=100, endTime=None)
 #     close_time = pd.to_datetime(candles['close_time'].to_numpy()[-1], unit='ms')
 #     # pprint.pprint(candles.to_numpy()[-1])
 #

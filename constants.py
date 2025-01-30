@@ -22,8 +22,9 @@ KLINE_INTERVAL = KLINE_INTERVAL_1MINUTE
 KLINE_TREND_INTERVAL = KLINE_INTERVAL_5MINUTE
 
 # Trend
-BULLISH = "bullish"
-BEARISH = "bearish"
+TREND_BULLISH = "bullish"
+TREND_BEARISH = "bearish"
+TREND_NONE = "none"
 
 # Swing
 SWING_HIGH = "swing_high"

@@ -39,6 +39,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Przykładowy model tabeli
 class Trades(Base):
     __tablename__ = "trades"
+
     id = Column(Integer, primary_key=True, index=True)
     date_time = Column(DateTime, index=True, unique=True)
     symbol = Column(String)
@@ -48,6 +49,11 @@ class Trades(Base):
     stop_loss = Column(Float)
     take_profit = Column(Float)
     timestamp = Column(DateTime, default=datetime.now, index=True)
+
+    def __repr__(self):
+        return (f"<Trades(id={self.id}, date_time={self.date_time}, symbol={self.symbol}, "
+                f"side={self.side}, price={self.price}, atr={self.atr}, "
+                f"stop_loss={self.stop_loss}, take_profit={self.take_profit}, timestamp={self.timestamp})>")
 
 # Tworzenie tabel
 Base.metadata.create_all(bind=engine)

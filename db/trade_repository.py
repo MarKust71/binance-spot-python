@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from sqlalchemy.exc import SQLAlchemyError
+
 from db import engine, SessionLocal, Side, Trades
 
 
@@ -24,8 +27,31 @@ class TradeRepository:
         self.session.add(trade)
         try:
             self.session.commit()
-        except Exception as e:
-            print(e)
+        # except Exception as e:
+        #     print(e)
+        #     self.session.rollback()
+        except SQLAlchemyError as e:
+            print(f"Błąd podczas aktualizacji transakcji: {e}")
+            self.session.rollback()
+
+    def update_trade(self, trade_id: int, **kwargs):
+        """
+        Aktualizuje istniejącą transakcję o podanym ID w bazie danych.
+
+        :param trade_id: ID transakcji do zaktualizowania
+        :param kwargs: Klucz-wartość z polami do aktualizacji (np. price=100.5)
+        """
+        try:
+            trade = self.session.query(Trades).filter_by(id=trade_id).first()
+            if trade:
+                for key, value in kwargs.items():
+                    if hasattr(trade, key):
+                        setattr(trade, key, value)
+                self.session.commit()
+            else:
+                print(f"Trade o ID {trade_id} nie istnieje.")
+        except SQLAlchemyError as e:
+            print(f"Błąd podczas aktualizacji transakcji: {e}")
             self.session.rollback()
 
     def get_all_trades(self):
@@ -39,6 +65,12 @@ class TradeRepository:
         Pobiera wszystkie transakcje dla danego symbolu.
         """
         return self.session.query(Trades).filter(Trades.symbol == symbol).all()
+
+    def get_trade_by_id(self, trade_id: int):
+        """
+        Pobiera wszystkie transakcje dla danego ID.
+        """
+        return self.session.query(Trades).filter(Trades.id == trade_id).first()
 
     def delete_trade(self, trade_id: int):
         """

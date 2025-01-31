@@ -3,6 +3,7 @@
 Strategy tester module.
 """
 
+
 import pandas as pd
 import numpy as np
 
@@ -122,5 +123,9 @@ if __name__ == '__main__':
     # trades = repo.get_all_trades()
     # for trade in trades:
     #     print(trade)
+    #
+    # trade = repo.get_trade_by_id(33)
+    # print(trade)
+    # print(trade.stop_loss)
     #
     # repo.close()

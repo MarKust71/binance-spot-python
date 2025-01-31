@@ -22,7 +22,11 @@ class TradeRepository:
             take_profit=round(price + atr * 2 if side == Side.BUY else price - atr * 2, 2)
         )
         self.session.add(trade)
-        self.session.commit()
+        try:
+            self.session.commit()
+        except Exception as e:
+            print(e)
+            self.session.rollback()
 
     def get_all_trades(self):
         """

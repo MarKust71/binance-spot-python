@@ -40,7 +40,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 class Trades(Base):
     __tablename__ = "trades"
     id = Column(Integer, primary_key=True, index=True)
-    date_time = Column(DateTime, index=True)
+    date_time = Column(DateTime, index=True, unique=True)
     symbol = Column(String)
     side = Column(Enum(Side), nullable=False)
     price = Column(Float)

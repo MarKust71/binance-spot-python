@@ -20,7 +20,7 @@ rsi = talib.RSI(candles['close'].to_numpy())
 sma = talib.SMA(rsi, timeperiod=14)
 print(timestamp, '| RSI:', rsi[-1], '| SMA:', sma[-1])
 
-print('determine_trend:', trend.upper())
+print('determine_trend:', trend.value.upper())
 
 ws = ws_kline(API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL)
 ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})

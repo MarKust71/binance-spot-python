@@ -6,12 +6,14 @@ from constants import Side
 from db.database import engine, SessionLocal
 from db.models.trades_model import Trades
 
+TP_SL_FACTOR = 3
 
 class TradeRepository:
     def __init__(self):
         """Inicjalizacja repozytorium"""
         self.engine = engine
         self.session = SessionLocal()
+
 
     def add_trade(
             self,
@@ -21,7 +23,7 @@ class TradeRepository:
             price: float,
             quantity: float,
             atr: float
-    ):
+    ) -> int | None:
         """
         Dodaje nową transakcję do bazy danych.
         """
@@ -33,7 +35,7 @@ class TradeRepository:
             quantity=quantity,
             atr=atr,
             stop_loss=round(price - atr if side == Side.BUY else price + atr, 2),
-            take_profit=round(price + atr * 2 if side == Side.BUY else price - atr * 2, 2),
+            take_profit=round(price + atr * TP_SL_FACTOR if side == Side.BUY else price - atr * TP_SL_FACTOR, 2),
             created_at=datetime.now(),
             updated_at=datetime.now()
         )
@@ -41,10 +43,13 @@ class TradeRepository:
 
         try:
             self.session.commit()
+            # print(f"Dodano nową transakcję - ID: {trade.id}")
+            return trade.id
 
         except SQLAlchemyError as e:
             print(f"Błąd podczas aktualizacji transakcji: {e}")
             self.session.rollback()
+            return None
 
 
     def update_trade(self, trade_id: int, **kwargs):

@@ -45,3 +45,9 @@ class TradeSignal(enum.Enum):
     SELL = "sell"
     BUY = "buy"
     NONE = "none"
+
+# Reason
+class Reason(enum.Enum):
+    STOP_LOSS = "STOP LOSS"
+    TAKE_PROFIT = "TAKE PROFIT"
+    NONE = "NONE"

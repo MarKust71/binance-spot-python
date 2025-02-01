@@ -4,8 +4,6 @@ Determine trend module.
 """
 
 
-import numpy as np
-
 from constants import Trend
 
 
@@ -57,13 +55,22 @@ def determine_trend(data_frame) -> Trend:
 
         fractals = data_frame[data_frame['Fractal_Up'].notnull() | data_frame['Fractal_Down'].notnull()][['timestamp', 'Fractal_Down', 'Fractal_Up']]
 
-        if not np.isnan(fractals['Fractal_Up'].iloc[-1]):
-            # print(f'Fractal_Up: {fractals['timestamp'].iloc[-1]}, {fractals['Fractal_Up'].iloc[-1]}')
-            return Trend.BEARISH
+        fractals_up = fractals[fractals['Fractal_Up'].notnull()]['Fractal_Up']
+        fractals_down = fractals[fractals['Fractal_Down'].notnull()]['Fractal_Down']
 
-        if not np.isnan(fractals['Fractal_Down'].iloc[-1]):
-            # print(f'Fractal_Down: {fractals['timestamp'].iloc[-1]}, {fractals['Fractal_Down'].iloc[-1]}')
+        # if not np.isnan(fractals['Fractal_Up'].iloc[-1]):
+        #     # print(f'Fractal_Up: {fractals['timestamp'].iloc[-1]}, {fractals['Fractal_Up'].iloc[-1]}')
+        #     return Trend.BEARISH
+        #
+        # if not np.isnan(fractals['Fractal_Down'].iloc[-1]):
+        #     # print(f'Fractal_Down: {fractals['timestamp'].iloc[-1]}, {fractals['Fractal_Down'].iloc[-1]}')
+        #     return Trend.BULLISH
+
+        if fractals_up.iloc[-1] > fractals_up.iloc[-2] and fractals_down.iloc[-1] > fractals_down.iloc[-2]:
             return Trend.BULLISH
+
+        if fractals_up.iloc[-1] < fractals_up.iloc[-2] and fractals_down.iloc[-1] < fractals_down.iloc[-2]:
+            return Trend.BEARISH
 
     return Trend.NONE
 

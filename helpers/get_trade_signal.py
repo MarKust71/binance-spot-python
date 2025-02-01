@@ -8,7 +8,7 @@ from constants import SWING_HIGH, SIGNAL_HIGH, SWING_LOW, SIGNAL_LOW, TradeSigna
 from helpers import get_rsi_signals
 
 
-def get_trade_signal(trend, data):
+def get_trade_signal(trend, data, fractals):
     """
     Get trade signal based on RSI signal and trend.
 
@@ -26,6 +26,7 @@ def get_trade_signal(trend, data):
     if signal_high or signal_low:
         print('\n**')
         print('determine_trend:', trend.value.upper())
+        print(fractals)
 
         for i in range(-3, 0):
             print(data['timestamp'].iloc[i].strftime('%Y-%m-%d %H:%M:%S'),

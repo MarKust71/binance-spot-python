@@ -18,13 +18,17 @@ class Trades(Base):
     atr = Column(Float)
     stop_loss = Column(Float)
     take_profit = Column(Float)
+    close_price = Column(Float)
+    profit = Column(Float)
     is_closed = Column(Boolean, default=False)
+    close_date_time = Column(DateTime)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
 
     def __repr__(self):
         return (f"<Trades(id={self.id}, date_time={self.date_time}, symbol={self.symbol}, "
-                f"side={self.side}, price={self.price}, atr={self.atr}, "
-                f"stop_loss={self.stop_loss}, take_profit={self.take_profit}, "
-                f"created_at={self.created_at}, updated_at={self.updated_at})>")
+                f"side={self.side}, quantity={self.quantity}, price={self.price}, atr={self.atr}, "
+                f"stop_loss={self.stop_loss}, take_profit={self.take_profit}, close_price={self.close_price}, "
+                f"is_closed={self.is_closed}, close_date_time={self.close_date_time}, created_at={self.created_at}, "
+                f"updated_at={self.updated_at})>")
 

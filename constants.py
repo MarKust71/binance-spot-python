@@ -2,9 +2,9 @@
 """
 App constants module.
 """
-
-
+import enum
 from decouple import config
+
 # from binance.enums import *
 from binance.enums import KLINE_INTERVAL_1MINUTE, KLINE_INTERVAL_5MINUTE
 
@@ -22,9 +22,10 @@ KLINE_INTERVAL = KLINE_INTERVAL_1MINUTE
 KLINE_TREND_INTERVAL = KLINE_INTERVAL_5MINUTE
 
 # Trend
-TREND_BULLISH = "bullish"
-TREND_BEARISH = "bearish"
-TREND_NONE = "none"
+class Trend(enum.Enum):
+    BULLISH = "bullish"
+    BEARISH = "bearish"
+    NONE = "none"
 
 # Swing
 SWING_HIGH = "swing_high"
@@ -34,7 +35,13 @@ SWING_LOW = "swing_low"
 SIGNAL_HIGH = "signal_high"
 SIGNAL_LOW = "signal_low"
 
+# Side
+class Side(enum.Enum):
+    SELL = "sell"
+    BUY = "buy"
+
 # Trade signals
-TRADE_SIGNAL_BUY = "buy"
-TRADE_SIGNAL_SELL = "sell"
-TRADE_SIGNAL_NONE = "none"
+class TradeSignal(enum.Enum):
+    SELL = "sell"
+    BUY = "buy"
+    NONE = "none"

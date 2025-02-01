@@ -6,10 +6,10 @@ Determine trend module.
 
 import numpy as np
 
-from constants import TREND_BULLISH, TREND_BEARISH, TREND_NONE
+from constants import Trend
 
 
-def determine_trend(data_frame) -> str:
+def determine_trend(data_frame) -> Trend:
     """
     This function does something.
 
@@ -59,13 +59,13 @@ def determine_trend(data_frame) -> str:
 
         if not np.isnan(fractals['Fractal_Up'].iloc[-1]):
             # print(f'Fractal_Up: {fractals['timestamp'].iloc[-1]}, {fractals['Fractal_Up'].iloc[-1]}')
-            return TREND_BEARISH
+            return Trend.BEARISH
 
         if not np.isnan(fractals['Fractal_Down'].iloc[-1]):
             # print(f'Fractal_Down: {fractals['timestamp'].iloc[-1]}, {fractals['Fractal_Down'].iloc[-1]}')
-            return TREND_BULLISH
+            return Trend.BULLISH
 
-    return TREND_NONE
+    return Trend.NONE
 
 
 if __name__ == '__main__':

@@ -4,9 +4,7 @@ Get trade signal module.
 """
 
 
-from constants import TRADE_SIGNAL_BUY, SWING_HIGH, SIGNAL_HIGH, TREND_BEARISH, \
-    TRADE_SIGNAL_SELL, SWING_LOW, SIGNAL_LOW, \
-    TREND_BULLISH, TRADE_SIGNAL_NONE
+from constants import SWING_HIGH, SIGNAL_HIGH, SWING_LOW, SIGNAL_LOW, TradeSignal, Trend
 from helpers import get_rsi_signals
 
 
@@ -27,7 +25,7 @@ def get_trade_signal(trend, data):
 
     if signal_high or signal_low:
         print('\n**')
-        print('determine_trend:', trend.upper())
+        print('determine_trend:', trend.value.upper())
 
         for i in range(-3, 0):
             print(data['timestamp'].iloc[i].strftime('%Y-%m-%d %H:%M:%S'),
@@ -47,10 +45,10 @@ def get_trade_signal(trend, data):
                   '| RSI signal LOW:', rsi_signals[SIGNAL_LOW]
                   )
 
-    if rsi_signals[SWING_HIGH] and rsi_signals[SIGNAL_HIGH] and trend == TREND_BEARISH:
-        return TRADE_SIGNAL_SELL
+    if rsi_signals[SWING_HIGH] and rsi_signals[SIGNAL_HIGH] and trend == Trend.BEARISH:
+        return TradeSignal.SELL
 
-    if rsi_signals[SWING_LOW] and rsi_signals[SIGNAL_LOW] and trend == TREND_BULLISH:
-        return TRADE_SIGNAL_BUY
+    if rsi_signals[SWING_LOW] and rsi_signals[SIGNAL_LOW] and trend == Trend.BULLISH:
+        return TradeSignal.BUY
 
-    return TRADE_SIGNAL_NONE
+    return TradeSignal.NONE

@@ -7,9 +7,8 @@ Strategy tester module.
 import pandas as pd
 import numpy as np
 
-from constants import TRADE_SYMBOL, KLINE_INTERVAL, \
-    TRADE_SIGNAL_SELL, TRADE_SIGNAL_BUY, TRADE_SIGNAL_NONE, KLINE_TREND_INTERVAL
-from db import TradeRepository, Side
+from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL, TradeSignal, Side
+from db.repositories import TradeRepository
 from helpers import (determine_trend, fetch_candles, get_trade_signal, set_fractals)
 
 LIMIT=1000
@@ -48,7 +47,7 @@ for i in range(0, len(candles) - SCOPE + 1):
     trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS])
     trade_signal = get_trade_signal(trend, data)
 
-    if trade_signal != TRADE_SIGNAL_NONE:
+    if trade_signal != TradeSignal.NONE:
         fractals = trend_data[
             trend_data['Fractal_Up'].notnull()
             | trend_data['Fractal_Down'].notnull()
@@ -73,25 +72,27 @@ for i in range(0, len(candles) - SCOPE + 1):
 
         print('timestamp:', data['timestamp'].iloc[-1])
 
-        if trade_signal != TRADE_SIGNAL_NONE:
+        if trade_signal != TradeSignal.NONE:
             print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
 
-        if trade_signal == TRADE_SIGNAL_SELL:
+        if trade_signal == TradeSignal.SELL:
             repo.add_trade(
                 date_time=data['timestamp'].iloc[-1],
                 symbol=TRADE_SYMBOL,
                 side=Side.SELL,
                 price=data["close"].to_numpy()[-1],
+                quantity=round(60 / data["close"].to_numpy()[-1], 4),
                 atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
             )
             print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
 
-        if trade_signal == TRADE_SIGNAL_BUY:
+        if trade_signal == TradeSignal.BUY:
             repo.add_trade(
                 date_time=data['timestamp'].iloc[-1],
                 symbol=TRADE_SYMBOL,
                 side=Side.BUY,
                 price=data["close"].to_numpy()[-1],
+                quantity=round(60 / data["close"].to_numpy()[-1], 4),
                 atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
             )
             print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')

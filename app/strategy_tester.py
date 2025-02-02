@@ -88,6 +88,7 @@ for i in range(0, len(candles) - SCOPE + 1):
 
         if trade_signal != TradeSignal.NONE:
             print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
+            print(f'QTY: {round(USDT_AMOUNT / data["close"].to_numpy()[-1], 4)}')
 
         if trade_signal == TradeSignal.SELL:
             new_trade_id = trades_repo.add_trade(

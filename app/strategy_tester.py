@@ -7,7 +7,7 @@ Strategy tester module.
 import pandas as pd
 import numpy as np
 
-from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL, TradeSignal, TRADE_VALUE
+from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL, TradeSignal, TRADE_VALUE, Side
 from db.repositories import TradeRepository
 from db.utils import db_update_trades
 from helpers import (determine_trend, fetch_candles, get_trade_signal, set_fractals)
@@ -33,7 +33,6 @@ trend_candles = fetch_candles(
 # candles.to_csv('candles.csv')
 # trend_candles.to_csv('trend_candles.csv')
 
-trades_repo = TradeRepository()
 
 
 for i in range(0, len(candles) - SCOPE + 1):
@@ -57,8 +56,6 @@ for i in range(0, len(candles) - SCOPE + 1):
     trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS])
     trade_signal = get_trade_signal(trend, data, fractals=last_fractals)
 
-    new_trade_id = None
-
     if trade_signal != TradeSignal.NONE:
         print('trend_data:')
         print(trend_data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(1))
@@ -69,14 +66,16 @@ for i in range(0, len(candles) - SCOPE + 1):
             print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
             print(f'QTY: {round(TRADE_VALUE / data["close"].to_numpy()[-1], 4)}')
 
-            new_trade_id = trades_repo.add_trade(
+            trades_repo = TradeRepository()
+            trades_repo.add_trade(
                 date_time=data['timestamp'].iloc[-1],
                 symbol=TRADE_SYMBOL,
-                side=trade_signal,
+                side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
                 price=data["close"].to_numpy()[-1],
                 quantity=round(TRADE_VALUE / data["close"].to_numpy()[-1], 4),
                 atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
             )
+            trades_repo.close()
 
         if trade_signal == TradeSignal.SELL:
             print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
@@ -94,7 +93,6 @@ for i in range(0, len(candles) - SCOPE + 1):
     )
 
 
-trades_repo.close()
 
 if __name__ == '__main__':
     pass

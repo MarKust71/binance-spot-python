@@ -8,7 +8,7 @@ import json
 import pandas as pd
 import numpy as np
 
-from constants import TRADE_SYMBOL, KLINE_INTERVAL, TRADE_VALUE, KLINE_TREND_INTERVAL, TradeSignal
+from constants import TRADE_SYMBOL, KLINE_INTERVAL, TRADE_VALUE, KLINE_TREND_INTERVAL, TradeSignal, Side
 from db.repositories import TradeRepository
 from helpers import fetch_candles, determine_trend, get_trade_signal, set_fractals
 
@@ -84,10 +84,10 @@ def handle_websocket_message(message) -> None:
                 print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
                 print(f'QTY: {quantity}')
 
-                new_trade_id = trades_repo.add_trade(
+                trades_repo.add_trade(
                     date_time=candles['timestamp'].iloc[-1],
                     symbol=TRADE_SYMBOL,
-                    side=trade_signal,
+                    side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
                     price=candles["close"].to_numpy()[-1],
                     quantity=quantity,
                     atr=np.round(trend_data["atr"].to_numpy()[-1], 2)

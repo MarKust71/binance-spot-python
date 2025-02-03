@@ -7,8 +7,9 @@ Strategy tester module.
 import pandas as pd
 import numpy as np
 
-from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL, TradeSignal, Side, Reason, TRADE_VALUE
+from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL, TradeSignal, TRADE_VALUE
 from db.repositories import TradeRepository
+from db.utils import db_update_trades
 from helpers import (determine_trend, fetch_candles, get_trade_signal, set_fractals)
 
 LIMIT = 1000
@@ -85,53 +86,12 @@ for i in range(0, len(candles) - SCOPE + 1):
 
         print('\n')
 
-    stored_trades = [trade for trade in trades_repo.get_all_trades() if trade.id != new_trade_id and not trade.is_closed]
 
-    for trade in stored_trades:
-        trade_closed = False
-        reason = Reason.NONE
-        profit = 0
-        current_price = 0
-
-        if trade.date_time >= current_date:
-            continue
-
-        if trade.side == Side.BUY or trade.side == Side.SELL:
-            if trade.side == Side.BUY:
-                if current_low <= trade.stop_loss:
-                    reason = Reason.STOP_LOSS
-                    profit = round(trade.quantity * (current_low - trade.price), 2)
-                    current_price = current_low
-                    trade_closed = True
-                elif current_high >= trade.take_profit:
-                    reason = Reason.TAKE_PROFIT
-                    profit = round(trade.quantity * (current_high - trade.price), 2)
-                    current_price = current_high
-                    trade_closed = True
-
-            if trade.side == Side.SELL:
-                if current_high >= trade.stop_loss:
-                    reason = Reason.STOP_LOSS
-                    profit = round(trade.quantity * (trade.price - current_high), 2)
-                    current_price = current_high
-                    trade_closed = True
-                elif current_low <= trade.take_profit:
-                    reason = Reason.TAKE_PROFIT
-                    profit = round(trade.quantity * (trade.price - current_low), 2)
-                    current_price = current_low
-                    trade_closed = True
-
-        if trade_closed:
-            trades_repo.update_trade(
-                trade.id,
-                is_closed=True,
-                close_price=current_price,
-                close_date_time = current_date,
-                quantity=0,  # Trade is fully closed
-                profit=trade.profit if trade.profit is not None else 0 + profit
-            )
-
-            print(f'ID: {trade.id} price: {current_price} date: {current_date} profit: {profit} ***** {reason.value} *****')
+    db_update_trades(
+        symbol=TRADE_SYMBOL,
+        price=data["close"].to_numpy()[-1],
+        timestamp=data['timestamp'].iloc[-1],
+    )
 
 
 trades_repo.close()

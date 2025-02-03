@@ -7,7 +7,7 @@ Strategy tester module.
 import pandas as pd
 import numpy as np
 
-from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL, TradeSignal, Side, Reason
+from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL, TradeSignal, Side, Reason, TRADE_VALUE
 from db.repositories import TradeRepository
 from helpers import (determine_trend, fetch_candles, get_trade_signal, set_fractals)
 
@@ -16,7 +16,6 @@ SCOPE = 2
 TREND_LIMIT = 1000
 FRACTALS_PERIODS = 8
 DELAY = 0
-USDT_AMOUNT = 3 * 20
 
 candles = fetch_candles(
     symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, endTime=None
@@ -40,7 +39,6 @@ for i in range(0, len(candles) - SCOPE + 1):
 
     data = candles.iloc[:SCOPE + i]
 
-    # current_close = data['close'].to_numpy()[-1]
     current_high = data['high'].to_numpy()[-1]
     current_low = data['low'].to_numpy()[-1]
     current_date = data['timestamp'].iloc[-1]
@@ -62,25 +60,6 @@ for i in range(0, len(candles) - SCOPE + 1):
     new_trade_id = None
 
     if trade_signal != TradeSignal.NONE:
-        # fractals = trend_data[
-        #     trend_data['Fractal_Up'].notnull()
-        #     | trend_data['Fractal_Down'].notnull()
-        # ][['timestamp', 'Fractal_Down', 'Fractal_Up']]
-        # print('fractals:')
-        # print(fractals[
-        #           fractals['Fractal_Up'].notnull() | fractals['Fractal_Down'].notnull()
-        #       ][['timestamp', 'Fractal_Down', 'Fractal_Up']].tail(4))
-
-        # print('ATR:', trend_data['timestamp'].iloc[-1].strftime('%Y-%m-%d %H:%M:%S'),
-        #       f'| price: {trend_data['close'].to_numpy()[-1]:,.2f}',
-        #       f'| RSI: {trend_data['rsi'].to_numpy()[-1]:,.2f}',
-        #       f'| SMA: {trend_data['sma'].to_numpy()[-1]:,.2f}',
-        #       f'| ATR: {trend_data['atr'].to_numpy()[-1]:,.2f}')
-
-        # print('data:')
-        # print(data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(4))
-        # print('trend_data:')
-        # print(trend_data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(4))
         print('trend_data:')
         print(trend_data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(1))
 
@@ -88,7 +67,7 @@ for i in range(0, len(candles) - SCOPE + 1):
 
         if trade_signal != TradeSignal.NONE:
             print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
-            print(f'QTY: {round(USDT_AMOUNT / data["close"].to_numpy()[-1], 4)}')
+            print(f'QTY: {round(TRADE_VALUE / data["close"].to_numpy()[-1], 4)}')
 
         if trade_signal == TradeSignal.SELL:
             new_trade_id = trades_repo.add_trade(
@@ -96,7 +75,7 @@ for i in range(0, len(candles) - SCOPE + 1):
                 symbol=TRADE_SYMBOL,
                 side=Side.SELL,
                 price=data["close"].to_numpy()[-1],
-                quantity=round(USDT_AMOUNT / data["close"].to_numpy()[-1], 4),
+                quantity=round(TRADE_VALUE / data["close"].to_numpy()[-1], 4),
                 atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
             )
             print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
@@ -107,7 +86,7 @@ for i in range(0, len(candles) - SCOPE + 1):
                 symbol=TRADE_SYMBOL,
                 side=Side.BUY,
                 price=data["close"].to_numpy()[-1],
-                quantity=round(USDT_AMOUNT / data["close"].to_numpy()[-1], 4),
+                quantity=round(TRADE_VALUE / data["close"].to_numpy()[-1], 4),
                 atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
             )
             print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')
@@ -125,29 +104,30 @@ for i in range(0, len(candles) - SCOPE + 1):
         if trade.date_time >= current_date:
             continue
 
-        if trade.side == Side.BUY:
-            if current_low <= trade.stop_loss:
-                reason = Reason.STOP_LOSS
-                profit = round(trade.quantity * (current_low - trade.price), 2)
-                current_price = current_low
-                trade_closed = True
-            elif current_high >= trade.take_profit:
-                reason = Reason.TAKE_PROFIT
-                profit = round(trade.quantity * (current_high - trade.price), 2)
-                current_price = current_high
-                trade_closed = True
+        if trade.side == Side.BUY or trade.side == Side.SELL:
+            if trade.side == Side.BUY:
+                if current_low <= trade.stop_loss:
+                    reason = Reason.STOP_LOSS
+                    profit = round(trade.quantity * (current_low - trade.price), 2)
+                    current_price = current_low
+                    trade_closed = True
+                elif current_high >= trade.take_profit:
+                    reason = Reason.TAKE_PROFIT
+                    profit = round(trade.quantity * (current_high - trade.price), 2)
+                    current_price = current_high
+                    trade_closed = True
 
-        if trade.side == Side.SELL:
-            if current_high >= trade.stop_loss:
-                reason = Reason.STOP_LOSS
-                profit = round(trade.quantity * (trade.price - current_high), 2)
-                current_price = current_high
-                trade_closed = True
-            elif current_low <= trade.take_profit:
-                reason = Reason.TAKE_PROFIT
-                profit = round(trade.quantity * (trade.price - current_low), 2)
-                current_price = current_low
-                trade_closed = True
+            if trade.side == Side.SELL:
+                if current_high >= trade.stop_loss:
+                    reason = Reason.STOP_LOSS
+                    profit = round(trade.quantity * (trade.price - current_high), 2)
+                    current_price = current_high
+                    trade_closed = True
+                elif current_low <= trade.take_profit:
+                    reason = Reason.TAKE_PROFIT
+                    profit = round(trade.quantity * (trade.price - current_low), 2)
+                    current_price = current_low
+                    trade_closed = True
 
         if trade_closed:
             trades_repo.update_trade(
@@ -161,18 +141,6 @@ for i in range(0, len(candles) - SCOPE + 1):
 
             print(f'ID: {trade.id} price: {current_price} date: {current_date} profit: {profit} ***** {reason.value} *****')
 
-
-
-    # else:
-    #     print(data['timestamp'].iloc[-1].strftime('%Y-%m-%d %H:%M:%S'),
-    #           f'| price: {data['close'].to_numpy()[-1]:,.2f}',
-    #           f'| RSI: {rsi[-1]:,.2f}',
-    #           f'| SMA: {sma[-1]:,.2f}', '| RSI swing:',
-    #           rsi_signals["swing"], '| RSI signal:', rsi_signals["signal"],
-    #           '| Trend:', trend.upper()
-    # #           f'| EMA50: {calculate_ema(trend_data['close'], 50).iloc[-1]:,.2f}',
-    # #           f'| EMA200: {calculate_ema(trend_data['close'], 200).iloc[-1]:,.2f}'
-    #           )
 
 trades_repo.close()
 

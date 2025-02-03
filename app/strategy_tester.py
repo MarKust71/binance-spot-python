@@ -54,7 +54,6 @@ for i in range(0, len(candles) - SCOPE + 1):
         ][['timestamp', 'Fractal_Down', 'Fractal_Up']].tail(4)
 
     trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS])
-    # trend = Trend.BEARISH
     trade_signal = get_trade_signal(trend, data, fractals=last_fractals)
 
     new_trade_id = None
@@ -69,26 +68,19 @@ for i in range(0, len(candles) - SCOPE + 1):
             print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
             print(f'QTY: {round(TRADE_VALUE / data["close"].to_numpy()[-1], 4)}')
 
-        if trade_signal == TradeSignal.SELL:
             new_trade_id = trades_repo.add_trade(
                 date_time=data['timestamp'].iloc[-1],
                 symbol=TRADE_SYMBOL,
-                side=Side.SELL,
+                side=trade_signal,
                 price=data["close"].to_numpy()[-1],
                 quantity=round(TRADE_VALUE / data["close"].to_numpy()[-1], 4),
                 atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
             )
+
+        if trade_signal == TradeSignal.SELL:
             print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
 
         if trade_signal == TradeSignal.BUY:
-            new_trade_id = trades_repo.add_trade(
-                date_time=data['timestamp'].iloc[-1],
-                symbol=TRADE_SYMBOL,
-                side=Side.BUY,
-                price=data["close"].to_numpy()[-1],
-                quantity=round(TRADE_VALUE / data["close"].to_numpy()[-1], 4),
-                atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
-            )
             print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')
 
         print('\n')

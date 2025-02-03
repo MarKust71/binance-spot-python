@@ -5,7 +5,7 @@ Create order module.
 
 
 # from binance.enums import *
-from binance.enums import ORDER_TYPE_MARKET, SIDE_SELL, SIDE_BUY
+from binance.enums import ORDER_TYPE_MARKET, SIDE_BUY
 from api import client
 from constants import TRADE_SYMBOL
 

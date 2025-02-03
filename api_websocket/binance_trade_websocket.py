@@ -1,15 +1,14 @@
-# api/binance_websocket.py
+# api/binance_trade_websocket.py
 """
 Binance websocket module.
 """
 
-
-import websocket
 import ssl
+import websocket
 
 from websocket import WebSocketApp
-from api_websocket.handle_websocket_message import handle_websocket_message
-from constants import API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL
+from api_websocket import handle_trade_websocket_message
+from constants import API_WEBSOCKET_URL, TRADE_SYMBOL
 
 
 def on_error(ws, error) -> None:
@@ -65,22 +64,21 @@ def on_message(ws, message) -> None:
     Returns:
         None.
     """
-    handle_websocket_message(message)
+    handle_trade_websocket_message(message)
 
 
-def ws_kline(url: str, symbol: str, interval: str) -> WebSocketApp:
+def ws_trade(url: str, symbol: str) -> WebSocketApp:
     """
     This function does something.
 
     Args:
         url: Description of param1.
         symbol: Description of param1.
-        interval: Description of param1.
 
     Returns:
         None.
     """
-    socket = f"{url}/ws/{symbol.lower()}@kline_{interval}"
+    socket = f"{url}/ws/{symbol.lower()}@trade"
     print(socket)
 
     return websocket.WebSocketApp(
@@ -89,5 +87,5 @@ def ws_kline(url: str, symbol: str, interval: str) -> WebSocketApp:
 
 
 if __name__ == '__main__':
-    ws = ws_kline(API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL)
+    ws = ws_trade(API_WEBSOCKET_URL, TRADE_SYMBOL)
     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})

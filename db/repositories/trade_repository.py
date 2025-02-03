@@ -35,6 +35,7 @@ class TradeRepository:
             quantity=quantity,
             atr=atr,
             stop_loss=round(price - atr if side == Side.BUY else price + atr, 2),
+            take_profit_partial=round(price + atr if side == Side.BUY else price - atr, 2),
             take_profit=round(price + atr * TP_SL_FACTOR if side == Side.BUY else price - atr * TP_SL_FACTOR, 2),
             created_at=datetime.now(),
             updated_at=datetime.now()

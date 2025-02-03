@@ -36,7 +36,7 @@ def handle_trade_websocket_message(message) -> None:
 
     json_message = json.loads(message)
     event_time = pd.to_datetime(json_message['E'], unit='ms')
-    event_price = json_message['p']
+    event_price = pd.to_numeric(json_message['p'])
     symbol = json_message['s']
 
     # print(

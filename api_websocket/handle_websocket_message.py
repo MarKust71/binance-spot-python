@@ -33,8 +33,6 @@ def handle_websocket_message(message) -> None:
 
     global LAST_CLOSE, current_date, current_low, current_high
 
-    trades_repo = TradeRepository()
-
     json_message = json.loads(message)
     event_time = pd.to_datetime(json_message['E'], unit='ms')
     # kline = json_message['k']
@@ -84,6 +82,7 @@ def handle_websocket_message(message) -> None:
                 print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
                 print(f'QTY: {quantity}')
 
+                trades_repo = TradeRepository()
                 trades_repo.add_trade(
                     date_time=candles['timestamp'].iloc[-1],
                     symbol=TRADE_SYMBOL,
@@ -92,6 +91,7 @@ def handle_websocket_message(message) -> None:
                     quantity=quantity,
                     atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
                 )
+                trades_repo.close()
 
                 # order_succeeded = create_order(
                 #     side=trade_signal,
@@ -108,7 +108,6 @@ def handle_websocket_message(message) -> None:
             print('\n')
 
 
-    trades_repo.close()
 
 
 if __name__ == '__main__':

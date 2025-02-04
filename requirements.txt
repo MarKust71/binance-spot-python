@@ -5,3 +5,5 @@ python-decouple==3.8
 SQLAlchemy==2.0.37
 websocket-client==1.8.0
 ta~=0.11.0
+python-binance==1.0.12
+python-decouple==3.8

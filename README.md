@@ -8,7 +8,7 @@
     python-decouple: https://pypi.org/project/python-decouple/, https://github.com/HBNetwork/python-decouple
     pandas: https://pandas.pydata.org/
     matplotlib: https://matplotlib.org/
-    mplfinance: https://pypi.org/project/mpl-finance/
+    mplfinance: https://github.com/matplotlib/mplfinance
     SQLAlchemy: https://www.sqlalchemy.org/
 
 pylint $(git ls-files '*.py')

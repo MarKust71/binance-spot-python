@@ -37,9 +37,9 @@ def handle_websocket_message(message) -> None:
     event_time = pd.to_datetime(json_message['E'], unit='ms')
     # kline = json_message['k']
 
-    candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, endTime=None)
+    candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, end_time=None)
     trend_candles = fetch_candles(
-        symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=TREND_LIMIT, endTime=None
+        symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=TREND_LIMIT, end_time=None
     )
 
     # print(f'candles: {candles["close"].iloc[-1]}')

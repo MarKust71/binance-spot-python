@@ -1,14 +1,18 @@
 # helpers/determine_trend.py
-from datetime import datetime
 
+# import talib
+# import btalib
+import ta
 import pandas as pd
-import talib
+# import pandas_ta as ta
 
+# from numpy import nan as npNaN
 from api import client
+from datetime import datetime
 
 
 # Funkcja pobierania danych świecowych
-def fetch_candles(symbol, interval, limit, endTime) -> pd.DataFrame:
+def fetch_candles(symbol, interval, limit, end_time) -> pd.DataFrame:
     """
     This function does something.
 
@@ -16,13 +20,13 @@ def fetch_candles(symbol, interval, limit, endTime) -> pd.DataFrame:
         symbol: Description of param1.
         interval: Description of param1.
         limit: Description of param1.
-        endTime: Description of param1.
+        end_time: Description of param1.
 
     Returns:
         Data frame with candles
     """
     try:
-        candles = client.get_klines(symbol=symbol, interval=interval, limit=limit, endTime=endTime)
+        candles = client.get_klines(symbol=symbol, interval=interval, limit=limit, endTime=end_time)
 
         data_frame = pd.DataFrame(candles, columns=[
             'timestamp', 'open', 'high', 'low', 'close', 'volume',
@@ -37,10 +41,23 @@ def fetch_candles(symbol, interval, limit, endTime) -> pd.DataFrame:
         data_frame['close'] = data_frame['close'].astype(float)
         data_frame['volume'] = data_frame['volume'].astype(float)
 
-        data_frame['atr'] = talib.ATR(data_frame['high'].to_numpy(), data_frame['low'].to_numpy(),
-                                      data_frame['close'].to_numpy(), timeperiod=14)
-        data_frame['rsi'] = talib.RSI(data_frame['close'].to_numpy(), timeperiod=14)
-        data_frame['sma'] = talib.SMA(data_frame['rsi'].to_numpy(), timeperiod=14)
+        # talib
+        # data_frame['atr'] = talib.ATR(data_frame['high'].to_numpy(), data_frame['low'].to_numpy(),
+        #                               data_frame['close'].to_numpy(), timeperiod=14)
+        # data_frame['rsi'] = talib.RSI(data_frame['close'].to_numpy(), timeperiod=14)
+        # data_frame['sma'] = talib.SMA(data_frame['rsi'].to_numpy(), timeperiod=14)
+
+        # pandas_ta
+        # data_frame['atr'] = ta.atr(data_frame['high'].to_numpy(), data_frame['low'].to_numpy(),
+        #                               data_frame['close'].to_numpy(), length=14)
+        # data_frame['rsi'] = ta.rsi(data_frame['close'].to_numpy(), length=14)
+        # data_frame['sma'] = ta.sma(data_frame['rsi'].to_numpy(), length=14)
+
+        # ta
+        data_frame['atr'] = ta.wrapper.AverageTrueRange(data_frame['high'], data_frame['low'],
+                                      data_frame['close'], window=14).average_true_range()
+        data_frame['rsi'] = ta.wrapper.RSIIndicator(data_frame['close'], window=14).rsi()
+        data_frame['sma'] = ta.wrapper.SMAIndicator(data_frame['rsi'], window=14).sma_indicator()
 
         return data_frame
 
@@ -58,7 +75,7 @@ if __name__ == '__main__':
     print(timestamp)
 
     try:
-        df = fetch_candles('ETHUSDT', '5m', 10, endTime=timestamp)
+        df = fetch_candles('ETHUSDT', '5m', 30, end_time=timestamp)
 
         if not df.empty:
             # Zapisywanie danych do pliku CSV

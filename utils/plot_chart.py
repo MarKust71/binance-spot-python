@@ -3,7 +3,7 @@ import mplfinance as mpf
 from constants import TRADE_SYMBOL, KLINE_TREND_INTERVAL
 from helpers import fetch_candles
 
-trend_candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=1000, endTime=None)
+trend_candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=1000, end_time=None)
 trend_candles.set_index('timestamp', inplace=True)
 
 mpf.plot(

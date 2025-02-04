@@ -26,10 +26,10 @@ def strategy_tester():
 
 
     candles = fetch_candles(
-        symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, endTime=None
+        symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, end_time=None
     )
     trend_candles = fetch_candles(
-        symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=TREND_LIMIT, endTime=None
+        symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=TREND_LIMIT, end_time=None
     )
 
     # tc = set_fractals(trend_candles, periods=FRACTALS_PERIODS)

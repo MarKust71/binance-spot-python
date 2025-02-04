@@ -3,9 +3,8 @@
 Binance websocket module.
 """
 
-
-import websocket
 import ssl
+import websocket
 
 from websocket import WebSocketApp
 from api_websocket.handle_websocket_message import handle_websocket_message
@@ -23,7 +22,7 @@ def on_error(ws, error) -> None:
     Returns:
         None
     """
-    print('error', error)
+    print('KLINES-> error', error)
 
 
 def on_open(ws) -> None:
@@ -36,7 +35,7 @@ def on_open(ws) -> None:
     Returns:
         None
     """
-    print('connection opened')
+    print('KLINES-> connection opened')
 
 
 def on_close(ws, status_code, close_msg) -> None:
@@ -51,7 +50,7 @@ def on_close(ws, status_code, close_msg) -> None:
     Returns:
         None
     """
-    print(f'connection closed: status code: {status_code}, message: {close_msg}')
+    print(f'KLINES-> connection closed: status code: {status_code}, message: {close_msg}')
 
 
 def on_message(ws, message) -> None:
@@ -81,7 +80,7 @@ def ws_kline(url: str, symbol: str, interval: str) -> WebSocketApp:
         None.
     """
     socket = f"{url}/ws/{symbol.lower()}@kline_{interval}"
-    print(socket)
+    print(f'KLINES-> socket: {socket}')
 
     return websocket.WebSocketApp(
         socket, on_open=on_open, on_close=on_close, on_message=on_message, on_error=on_error

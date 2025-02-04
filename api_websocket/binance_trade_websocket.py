@@ -7,7 +7,7 @@ import ssl
 import websocket
 
 from websocket import WebSocketApp
-from api_websocket import handle_trade_websocket_message
+from api_websocket.handle_trade_websocket_message import handle_trade_websocket_message
 from constants import API_WEBSOCKET_URL, TRADE_SYMBOL
 
 
@@ -22,7 +22,7 @@ def on_error(ws, error) -> None:
     Returns:
         None
     """
-    print('error', error)
+    print('TRADES-> error', error)
 
 
 def on_open(ws) -> None:
@@ -35,7 +35,7 @@ def on_open(ws) -> None:
     Returns:
         None
     """
-    print('connection opened')
+    print('TRADES-> connection opened')
 
 
 def on_close(ws, status_code, close_msg) -> None:
@@ -50,7 +50,7 @@ def on_close(ws, status_code, close_msg) -> None:
     Returns:
         None
     """
-    print(f'connection closed: status code: {status_code}, message: {close_msg}')
+    print(f'TRADES-> connection closed: status code: {status_code}, message: {close_msg}')
 
 
 def on_message(ws, message) -> None:
@@ -79,7 +79,7 @@ def ws_trade(url: str, symbol: str) -> WebSocketApp:
         None.
     """
     socket = f"{url}/ws/{symbol.lower()}@trade"
-    print(socket)
+    print(f'TRADES-> socket: {socket}')
 
     return websocket.WebSocketApp(
         socket, on_open=on_open, on_close=on_close, on_message=on_message, on_error=on_error

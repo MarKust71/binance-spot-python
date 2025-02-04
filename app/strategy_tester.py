@@ -18,84 +18,91 @@ TREND_LIMIT = 1000
 FRACTALS_PERIODS = 8
 DELAY = 0
 
-candles = fetch_candles(
-    symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, endTime=None
-)
-trend_candles = fetch_candles(
-    symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=TREND_LIMIT, endTime=None
-)
-
-# tc = set_fractals(trend_candles, periods=FRACTALS_PERIODS)
-# fr = tc[tc['Fractal_Up'].notnull() | tc['Fractal_Down'].notnull()][['timestamp', 'Fractal_Down', 'Fractal_Up']]
-# print(fr)
-# fr.to_csv('fractals.csv')
-
-# candles.to_csv('candles.csv')
-# trend_candles.to_csv('trend_candles.csv')
+def strategy_tester():
+    """
+    Strategy tester function.
+    """
+    pass
 
 
+    candles = fetch_candles(
+        symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, endTime=None
+    )
+    trend_candles = fetch_candles(
+        symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=TREND_LIMIT, endTime=None
+    )
 
-for i in range(0, len(candles) - SCOPE + 1):
+    # tc = set_fractals(trend_candles, periods=FRACTALS_PERIODS)
+    # fr = tc[tc['Fractal_Up'].notnull() | tc['Fractal_Down'].notnull()][['timestamp', 'Fractal_Down', 'Fractal_Up']]
+    # print(fr)
+    # fr.to_csv('fractals.csv')
 
-    data = candles.iloc[:SCOPE + i]
+    # candles.to_csv('candles.csv')
+    # trend_candles.to_csv('trend_candles.csv')
 
-    current_high = data['high'].to_numpy()[-1]
-    current_low = data['low'].to_numpy()[-1]
-    current_date = data['timestamp'].iloc[-1]
 
-    trend_data = trend_candles[
-        trend_candles['timestamp']
-        <= data['timestamp'].iloc[-1] - pd.Timedelta(minutes=DELAY * FRACTALS_PERIODS)
-    ]
-    trend_data=set_fractals(trend_data, periods=FRACTALS_PERIODS)
-    last_fractals = trend_data[
-        trend_data['Fractal_Up'].notnull()
-        | trend_data['Fractal_Down'].notnull()
-        ][['timestamp', 'Fractal_Down', 'Fractal_Up']].tail(4)
 
-    trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS])
-    trade_signal = get_trade_signal(trend, data, fractals=last_fractals)
+    for i in range(0, len(candles) - SCOPE + 1):
 
-    if trade_signal != TradeSignal.NONE:
-        print('trend_data:')
-        print(trend_data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(1))
+        data = candles.iloc[:SCOPE + i]
 
-        print('timestamp:', data['timestamp'].iloc[-1])
+        current_high = data['high'].to_numpy()[-1]
+        current_low = data['low'].to_numpy()[-1]
+        current_date = data['timestamp'].iloc[-1]
+
+        trend_data = trend_candles[
+            trend_candles['timestamp']
+            <= data['timestamp'].iloc[-1] - pd.Timedelta(minutes=DELAY * FRACTALS_PERIODS)
+        ]
+        trend_data=set_fractals(trend_data, periods=FRACTALS_PERIODS)
+        last_fractals = trend_data[
+            trend_data['Fractal_Up'].notnull()
+            | trend_data['Fractal_Down'].notnull()
+            ][['timestamp', 'Fractal_Down', 'Fractal_Up']].tail(4)
+
+        trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS])
+        trade_signal = get_trade_signal(trend, data, fractals=last_fractals)
 
         if trade_signal != TradeSignal.NONE:
-            print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
-            print(f'QTY: {round(TRADE_VALUE / data["close"].to_numpy()[-1], 4)}')
+            print('trend_data:')
+            print(trend_data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(1))
 
-            trades_repo = TradeRepository()
-            trades_repo.add_trade(
-                date_time=data['timestamp'].iloc[-1],
-                symbol=TRADE_SYMBOL,
-                side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
-                price=data["close"].to_numpy()[-1],
-                quantity=round(TRADE_VALUE / data["close"].to_numpy()[-1], 4),
-                atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
-            )
-            trades_repo.close()
+            print('timestamp:', data['timestamp'].iloc[-1])
 
-        if trade_signal == TradeSignal.SELL:
-            print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
+            if trade_signal != TradeSignal.NONE:
+                print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
+                print(f'QTY: {round(TRADE_VALUE / data["close"].to_numpy()[-1], 4)}')
 
-        if trade_signal == TradeSignal.BUY:
-            print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')
+                trades_repo = TradeRepository()
+                trades_repo.add_trade(
+                    date_time=data['timestamp'].iloc[-1],
+                    symbol=TRADE_SYMBOL,
+                    side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
+                    price=data["close"].to_numpy()[-1],
+                    quantity=round(TRADE_VALUE / data["close"].to_numpy()[-1], 4),
+                    atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
+                )
+                trades_repo.close()
 
-        print('\n')
+            if trade_signal == TradeSignal.SELL:
+                print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
+
+            if trade_signal == TradeSignal.BUY:
+                print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')
+
+            print('\n')
 
 
-    db_update_trades(
-        symbol=TRADE_SYMBOL,
-        price=data["close"].to_numpy()[-1],
-        timestamp=data['timestamp'].iloc[-1],
-    )
+        db_update_trades(
+            symbol=TRADE_SYMBOL,
+            price=data["close"].to_numpy()[-1],
+            timestamp=data['timestamp'].iloc[-1],
+        )
 
 
 
 if __name__ == '__main__':
-    pass
+    strategy_tester()
 
     # trades_repo = TradeRepository()
     #

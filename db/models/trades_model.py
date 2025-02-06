@@ -37,3 +37,23 @@ class Trades(Base):
                 f"is_closed={self.is_closed}, close_date_time={self.close_date_time}, created_at={self.created_at}, "
                 f"updated_at={self.updated_at})>")
 
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'date_time': self.date_time,
+            'symbol': self.symbol,
+            'side': self.side,
+            'quantity': self.quantity,
+            'price': self.price,
+            'atr': self.atr,
+            'stop_loss': self.stop_loss,
+            'take_profit': self.take_profit,
+            'close_price': self.close_price,
+            'take_profit_partial': self.take_profit_partial,
+            'take_profit_partial_price': self.take_profit_partial_price,
+            'take_profit_partial_date_time': self.take_profit_partial_date_time,
+            'is_closed': self.is_closed,
+            'close_date_time': self.close_date_time,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }

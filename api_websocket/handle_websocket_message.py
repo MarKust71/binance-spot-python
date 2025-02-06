@@ -6,18 +6,17 @@ Binance handle websocket message module.
 
 import json
 import pandas as pd
-import numpy as np
 
-from constants import TRADE_SYMBOL, KLINE_INTERVAL, TRADE_VALUE, KLINE_TREND_INTERVAL, TradeSignal, Side
-from db.repositories import TradeRepository
-from helpers import fetch_candles, determine_trend, get_trade_signal, set_fractals
+from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL
+from db.utils import db_add_trade
+from helpers import fetch_candles
 
 LIMIT = 200
 TREND_LIMIT = 200
 DELAY = 0
 FRACTALS_PERIODS = 8
 
-LAST_CLOSE = current_date = current_low = current_high = None
+LAST_CLOSE = None
 
 def handle_websocket_message(message) -> None:
     """
@@ -31,7 +30,7 @@ def handle_websocket_message(message) -> None:
     """
 
 
-    global LAST_CLOSE, current_date, current_low, current_high
+    global LAST_CLOSE
 
     json_message = json.loads(message)
     event_time = pd.to_datetime(json_message['E'], unit='ms')
@@ -42,8 +41,6 @@ def handle_websocket_message(message) -> None:
         symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=TREND_LIMIT, end_time=None
     )
 
-    # print(f'candles: {candles["close"].iloc[-1]}')
-
     close_time = pd.to_datetime(candles['close_time'].to_numpy()[-1], unit='ms')
     close_price = candles['close'].to_numpy()[-1]
     is_candle_closed = close_time < event_time
@@ -53,56 +50,15 @@ def handle_websocket_message(message) -> None:
         LAST_CLOSE = close_time
         print(f'Candle closed: {close_time} | price: {close_price:,.2f}')
 
-        current_high = candles['high'].to_numpy()[-1]
-        current_low = candles['low'].to_numpy()[-1]
-        current_date = candles['timestamp'].iloc[-1]
+        new_trade_id = db_add_trade(
+            candles=candles,
+            trend_candles=trend_candles,
+            delay=DELAY,
+            fractals_periods=FRACTALS_PERIODS,
+        )
 
-        trend_data = trend_candles[
-            trend_candles['timestamp']
-            <= candles['timestamp'].iloc[-1] - pd.Timedelta(minutes=DELAY * FRACTALS_PERIODS)
-            ]
-        trend_data=set_fractals(trend_data, periods=FRACTALS_PERIODS)
-        last_fractals = trend_data[
-            trend_data['Fractal_Up'].notnull()
-            | trend_data['Fractal_Down'].notnull()
-            ][['timestamp', 'Fractal_Down', 'Fractal_Up']].tail(4)
-
-        trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS], candles.iloc[-1])
-
-        trade_signal = get_trade_signal(trend, candles, fractals=last_fractals)
-
-        if trade_signal != TradeSignal.NONE:
-            quantity=round(TRADE_VALUE / candles["close"].to_numpy()[-1], 4)
-
-            print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
-            print(f'QTY: {quantity}')
-
-            trades_repo = TradeRepository()
-            new_trade_id = trades_repo.add_trade(
-                date_time=candles['timestamp'].iloc[-1],
-                symbol=TRADE_SYMBOL,
-                side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
-                price=candles["close"].to_numpy()[-1],
-                quantity=quantity,
-                atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
-            )
-            trades_repo.close()
-
-            print(f'ID: {new_trade_id}')
-
-            if trade_signal == TradeSignal.SELL:
-                print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
-
-            if trade_signal == TradeSignal.BUY:
-                print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')
-
-            print('\n')
-
-            # order_succeeded = create_order(
-            #     side=trade_signal,
-            #     quantity=quantity,
-            #     symbol=TRADE_SYMBOL
-            # )
+        if new_trade_id != -1:
+            print(f'New trade created, ID: {new_trade_id}')
 
 
 if __name__ == '__main__':

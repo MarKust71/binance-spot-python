@@ -4,13 +4,9 @@ Strategy tester module.
 """
 
 
-import pandas as pd
-import numpy as np
-
-from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL, TradeSignal, TRADE_VALUE, Side
-from db.repositories import TradeRepository
-from db.utils import db_update_trades
-from helpers import (determine_trend, fetch_candles, get_trade_signal, set_fractals)
+from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL
+from db.utils import db_update_trades, db_add_trade
+from helpers import fetch_candles
 
 LIMIT = 1000
 SCOPE = 2
@@ -46,58 +42,21 @@ def strategy_tester():
 
         data = candles.iloc[:SCOPE + i]
 
-        current_high = data['high'].to_numpy()[-1]
-        current_low = data['low'].to_numpy()[-1]
-        current_date = data['timestamp'].iloc[-1]
+        new_trade_id = db_add_trade(
+            candles=data,
+            trend_candles=trend_candles,
+            delay=DELAY,
+            fractals_periods=FRACTALS_PERIODS,
+        )
 
-        trend_data = trend_candles[
-            trend_candles['timestamp']
-            <= data['timestamp'].iloc[-1] - pd.Timedelta(minutes=DELAY * FRACTALS_PERIODS)
-        ]
-        trend_data=set_fractals(trend_data, periods=FRACTALS_PERIODS)
-        last_fractals = trend_data[
-            trend_data['Fractal_Up'].notnull()
-            | trend_data['Fractal_Down'].notnull()
-            ][['timestamp', 'Fractal_Down', 'Fractal_Up']].tail(4)
-
-        trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS], data.iloc[-1])
-
-        trade_signal = get_trade_signal(trend, data, fractals=last_fractals)
-
-        if trade_signal != TradeSignal.NONE:
-            quantity=round(TRADE_VALUE / data["close"].to_numpy()[-1], 4)
-
-            print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
-            print(f'QTY: {quantity}')
-
-            trades_repo = TradeRepository()
-            new_trade_id = trades_repo.add_trade(
-                date_time=data['timestamp'].iloc[-1],
-                symbol=TRADE_SYMBOL,
-                side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
-                price=data["close"].to_numpy()[-1],
-                quantity=quantity,
-                atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
-            )
-            trades_repo.close()
-
-            print(f'ID: {new_trade_id}')
-
-            if trade_signal == TradeSignal.SELL:
-                print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
-
-            if trade_signal == TradeSignal.BUY:
-                print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')
-
-            print('\n')
-
+        if new_trade_id != -1:
+            print(f'New trade created, ID: {new_trade_id}')
 
         db_update_trades(
             symbol=TRADE_SYMBOL,
             price=data["close"].to_numpy()[-1],
             timestamp=data['timestamp'].iloc[-1],
         )
-
 
 
 if __name__ == '__main__':

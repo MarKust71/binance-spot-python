@@ -17,7 +17,7 @@ def db_add_trade(
     trend_candles: pd.DataFrame,
     delay: int,
     fractals_periods: int,
-) -> int:
+) -> int | None:
     """
     Add a new trade to the database.
 

@@ -44,7 +44,6 @@ class TradeRepository:
 
         try:
             self.session.commit()
-            # print(f"Dodano nową transakcję - ID: {trade.id}")
             return trade.id
 
         except SQLAlchemyError as e:

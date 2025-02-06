@@ -57,7 +57,7 @@ def handle_websocket_message(message) -> None:
             fractals_periods=FRACTALS_PERIODS,
         )
 
-        if new_trade_id != -1:
+        if new_trade_id != -1 and new_trade_id is not None:
             print(f'New trade created, ID: {new_trade_id}')
 
 

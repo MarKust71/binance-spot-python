@@ -67,7 +67,7 @@ def handle_websocket_message(message) -> None:
             | trend_data['Fractal_Down'].notnull()
             ][['timestamp', 'Fractal_Down', 'Fractal_Up']].tail(4)
 
-        trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS])
+        trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS], candles.iloc[-1])
         trade_signal = get_trade_signal(trend, candles, fractals=last_fractals)
 
         if trade_signal != TradeSignal.NONE:

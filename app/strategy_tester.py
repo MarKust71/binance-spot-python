@@ -60,7 +60,8 @@ def strategy_tester():
             | trend_data['Fractal_Down'].notnull()
             ][['timestamp', 'Fractal_Down', 'Fractal_Up']].tail(4)
 
-        trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS])
+        trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS], data.iloc[-1])
+
         trade_signal = get_trade_signal(trend, data, fractals=last_fractals)
 
         if trade_signal != TradeSignal.NONE:

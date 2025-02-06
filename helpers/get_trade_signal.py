@@ -27,6 +27,7 @@ def get_trade_signal(trend, data, fractals):
         print('\n**')
         print('determine_trend:', trend.value.upper())
         print(fractals)
+        print(f'last candle:\n{data[['timestamp', 'high', 'low', 'close']].tail(1)}')
 
         for i in range(-3, 0):
             print(data['timestamp'].iloc[i].strftime('%Y-%m-%d %H:%M:%S'),

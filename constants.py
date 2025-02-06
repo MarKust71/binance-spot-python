@@ -26,6 +26,7 @@ class Trend(enum.Enum):
     BULLISH = "bullish"
     BEARISH = "bearish"
     NONE = "none"
+    BROKEN = "broken"
 
 # Swing
 SWING_HIGH = "swing_high"

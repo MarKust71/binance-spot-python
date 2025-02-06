@@ -37,12 +37,12 @@ def determine_trend(data_frame, candle) -> Trend:
         if fractals_up.iloc[-1] > fractals_up.iloc[-2] and fractals_down.iloc[-1] > fractals_down.iloc[-2]:
             return_value = Trend.BULLISH
             if CHECK_CURRENT_CANDLE and fractals_down.iloc[-1] > candle['low']:
-                return_value = Trend.NONE
+                return_value = Trend.BROKEN
 
         if fractals_up.iloc[-1] < fractals_up.iloc[-2] and fractals_down.iloc[-1] < fractals_down.iloc[-2]:
             return_value = Trend.BEARISH
             if CHECK_CURRENT_CANDLE and fractals_up.iloc[-1] < candle['high']:
-                return_value = Trend.NONE
+                return_value = Trend.BROKEN
 
     return return_value
 

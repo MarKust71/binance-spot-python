@@ -68,36 +68,27 @@ def handle_websocket_message(message) -> None:
             ][['timestamp', 'Fractal_Down', 'Fractal_Up']].tail(4)
 
         trend = determine_trend(trend_data.iloc[:-FRACTALS_PERIODS], candles.iloc[-1])
+
         trade_signal = get_trade_signal(trend, candles, fractals=last_fractals)
 
         if trade_signal != TradeSignal.NONE:
-            print('trend_data:')
-            print(trend_data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(1))
-
-            print('timestamp:', candles['timestamp'].iloc[-1])
-
             quantity=round(TRADE_VALUE / candles["close"].to_numpy()[-1], 4)
 
-            if trade_signal != TradeSignal.NONE:
-                print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
-                print(f'QTY: {quantity}')
+            print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
+            print(f'QTY: {quantity}')
 
-                trades_repo = TradeRepository()
-                trades_repo.add_trade(
-                    date_time=candles['timestamp'].iloc[-1],
-                    symbol=TRADE_SYMBOL,
-                    side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
-                    price=candles["close"].to_numpy()[-1],
-                    quantity=quantity,
-                    atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
-                )
-                trades_repo.close()
+            trades_repo = TradeRepository()
+            new_trade_id = trades_repo.add_trade(
+                date_time=candles['timestamp'].iloc[-1],
+                symbol=TRADE_SYMBOL,
+                side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
+                price=candles["close"].to_numpy()[-1],
+                quantity=quantity,
+                atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
+            )
+            trades_repo.close()
 
-                # order_succeeded = create_order(
-                #     side=trade_signal,
-                #     quantity=quantity,
-                #     symbol=TRADE_SYMBOL
-                # )
+            print(f'ID: {new_trade_id}')
 
             if trade_signal == TradeSignal.SELL:
                 print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')
@@ -107,7 +98,11 @@ def handle_websocket_message(message) -> None:
 
             print('\n')
 
-
+            # order_succeeded = create_order(
+            #     side=trade_signal,
+            #     quantity=quantity,
+            #     symbol=TRADE_SYMBOL
+            # )
 
 
 if __name__ == '__main__':

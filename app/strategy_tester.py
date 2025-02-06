@@ -65,25 +65,23 @@ def strategy_tester():
         trade_signal = get_trade_signal(trend, data, fractals=last_fractals)
 
         if trade_signal != TradeSignal.NONE:
-            print('trend_data:')
-            print(trend_data[['timestamp', 'close', 'rsi', 'sma', 'atr']].tail(1))
+            quantity=round(TRADE_VALUE / data["close"].to_numpy()[-1], 4)
 
-            print('timestamp:', data['timestamp'].iloc[-1])
+            print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
+            print(f'QTY: {quantity}')
 
-            if trade_signal != TradeSignal.NONE:
-                print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
-                print(f'QTY: {round(TRADE_VALUE / data["close"].to_numpy()[-1], 4)}')
+            trades_repo = TradeRepository()
+            new_trade_id = trades_repo.add_trade(
+                date_time=data['timestamp'].iloc[-1],
+                symbol=TRADE_SYMBOL,
+                side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
+                price=data["close"].to_numpy()[-1],
+                quantity=quantity,
+                atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
+            )
+            trades_repo.close()
 
-                trades_repo = TradeRepository()
-                trades_repo.add_trade(
-                    date_time=data['timestamp'].iloc[-1],
-                    symbol=TRADE_SYMBOL,
-                    side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
-                    price=data["close"].to_numpy()[-1],
-                    quantity=round(TRADE_VALUE / data["close"].to_numpy()[-1], 4),
-                    atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
-                )
-                trades_repo.close()
+            print(f'ID: {new_trade_id}')
 
             if trade_signal == TradeSignal.SELL:
                 print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')

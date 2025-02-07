@@ -33,6 +33,7 @@ class TradeRepository:
             side=side,
             price=price,
             quantity=quantity,
+            rest_quantity=quantity,
             atr=atr,
             stop_loss=round(price - atr if side == Side.BUY else price + atr, 2),
             take_profit_partial=round(price + atr if side == Side.BUY else price - atr, 2),

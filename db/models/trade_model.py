@@ -14,11 +14,13 @@ class Trade(Base):
     symbol = Column(String)
     side = Column(Enum(Side), nullable=False)
     quantity = Column(Float)
+    rest_quantity = Column(Float)
     price = Column(Float)
     atr = Column(Float)
     stop_loss = Column(Float)
     take_profit_partial = Column(Float)
     take_profit_partial_price = Column(Float)
+    take_profit_partial_quantity = Column(Float)
     take_profit_partial_date_time = Column(DateTime)
     take_profit = Column(Float)
     close_price = Column(Float)
@@ -30,12 +32,13 @@ class Trade(Base):
 
     def __repr__(self):
         return (f"<Trades(id={self.id}, date_time={self.date_time}, symbol={self.symbol}, "
-                f"side={self.side}, quantity={self.quantity}, price={self.price}, atr={self.atr}, "
-                f"stop_loss={self.stop_loss}, take_profit={self.take_profit}, close_price={self.close_price}, "
-                f"take_profit_partial={self.take_profit_partial}, take_profit_partial_price={self.take_profit_partial_price}, "
-                f"take_profit_partial_date_time={self.take_profit_partial_date_time}, "
-                f"is_closed={self.is_closed}, close_date_time={self.close_date_time}, created_at={self.created_at}, "
-                f"updated_at={self.updated_at})>")
+                f"side={self.side}, quantity={self.quantity}, rest_quantity={self.rest_quantity}, price={self.price}, "
+                f"atr={self.atr}, stop_loss={self.stop_loss}, take_profit={self.take_profit}, "
+                f"close_price={self.close_price}, take_profit_partial={self.take_profit_partial}, "
+                f"take_profit_partial_price={self.take_profit_partial_price}, "
+                f"take_profit_partial_quantity={self.take_profit_partial_quantity}, "
+                f"take_profit_partial_date_time={self.take_profit_partial_date_time}, is_closed={self.is_closed}, "
+                f"close_date_time={self.close_date_time}, created_at={self.created_at}, updated_at={self.updated_at})>")
 
     def as_dict(self):
         return {
@@ -44,6 +47,7 @@ class Trade(Base):
             'symbol': self.symbol,
             'side': self.side,
             'quantity': self.quantity,
+            'rest_quantity': self.rest_quantity,
             'price': self.price,
             'atr': self.atr,
             'stop_loss': self.stop_loss,
@@ -51,6 +55,7 @@ class Trade(Base):
             'close_price': self.close_price,
             'take_profit_partial': self.take_profit_partial,
             'take_profit_partial_price': self.take_profit_partial_price,
+            'take_profit_partial_quantity': self.take_profit_partial_quantity,
             'take_profit_partial_date_time': self.take_profit_partial_date_time,
             'is_closed': self.is_closed,
             'close_date_time': self.close_date_time,

@@ -66,7 +66,6 @@ def db_add_trade(
         if trade_signal == TradeSignal.BUY:
             print('***** BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY BUY *****')
 
-        print('\n')
 
         #
         #     order_succeeded = create_order(

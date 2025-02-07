@@ -50,7 +50,7 @@ def strategy_tester():
         )
 
         if new_trade_id != -1 and new_trade_id is not None:
-            print(f'New trade created, ID: {new_trade_id}')
+            print(f'New trade created, ID: {new_trade_id}\n')
 
         db_update_trades(
             symbol=TRADE_SYMBOL,

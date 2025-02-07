@@ -3,10 +3,9 @@
 App constants module.
 """
 import enum
-from decouple import config
 
-# from binance.enums import *
-from binance.enums import KLINE_INTERVAL_1MINUTE, KLINE_INTERVAL_5MINUTE
+from binance import KLINE_INTERVAL_1MINUTE, KLINE_INTERVAL_5MINUTE
+from decouple import config
 
 API_WEBSOCKET_URL = config('API_WEBSOCKET_URL')
 

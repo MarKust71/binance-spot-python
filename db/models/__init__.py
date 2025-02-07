@@ -1,2 +1,2 @@
-from .trades_model import Trades
-from .balances_model import Balances
+from .trade_model import Trade
+from .balances_model import Balance

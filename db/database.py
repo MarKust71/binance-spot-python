@@ -3,7 +3,6 @@ from sqlalchemy.orm import sessionmaker
 from pathlib import Path
 
 from db.models.models import Base
-from db.models import Trades, Balances
 
 # Pobranie ścieżki do katalogu głównego aplikacji
 BASE_DIR = Path(__file__).resolve().parent

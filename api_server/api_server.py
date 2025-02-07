@@ -61,11 +61,11 @@ def read_items(
     }
 
 # Uruchomienie serwera komendą:
-# uvicorn script_name:app --reload
+# uvicorn script_name:app --reload --host 0.0.0.0 --port 8000
 #
 # http://127.0.0.1:8000/items/?offset=0&limit=5
 
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

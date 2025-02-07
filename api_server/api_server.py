@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, Query
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 # from typing import List
 

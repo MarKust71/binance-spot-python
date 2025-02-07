@@ -6,7 +6,7 @@ from db.models.models import Base
 
 
 # Model tabeli balances
-class Balances(Base):
+class Balance(Base):
     __tablename__ = "balances"
 
     id = Column(Integer, primary_key=True, index=True)

@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from constants import Side
 from db.database import engine, SessionLocal
-from db.models.trades_model import Trades
+from db.models.trade_model import Trade
 
 TP_SL_FACTOR = 3
 
@@ -27,7 +27,7 @@ class TradeRepository:
         """
         Dodaje nową transakcję do bazy danych.
         """
-        trade = Trades(
+        trade = Trade(
             date_time=date_time,
             symbol=symbol,
             side=side,
@@ -60,7 +60,7 @@ class TradeRepository:
         :param kwargs: Klucz-wartość z polami do aktualizacji (np. price=100.5)
         """
         try:
-            trade = self.session.query(Trades).filter_by(id=trade_id).first()
+            trade = self.session.query(Trade).filter_by(id=trade_id).first()
             if trade:
                 for key, value in kwargs.items():
                     if hasattr(trade, key):
@@ -81,28 +81,28 @@ class TradeRepository:
         """
         Pobiera wszystkie transakcje z bazy danych.
         """
-        return self.session.query(Trades).all()
+        return self.session.query(Trade).all()
 
 
     def get_trades_by_symbol(self, symbol: str):
         """
         Pobiera wszystkie transakcje dla danego symbolu.
         """
-        return self.session.query(Trades).filter(Trades.symbol == symbol).all()
+        return self.session.query(Trade).filter(Trade.symbol == symbol).all()
 
 
     def get_trade_by_id(self, trade_id: int):
         """
         Pobiera wszystkie transakcje dla danego ID.
         """
-        return self.session.query(Trades).filter(Trades.id == trade_id).first()
+        return self.session.query(Trade).filter(Trade.id == trade_id).first()
 
 
     def delete_trade(self, trade_id: int):
         """
         Usuwa transakcję na podstawie ID.
         """
-        trade = self.session.query(Trades).filter(Trades.id == trade_id).first()
+        trade = self.session.query(Trade).filter(Trade.id == trade_id).first()
         if trade:
             self.session.delete(trade)
             self.session.commit()

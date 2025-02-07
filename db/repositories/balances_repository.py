@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from db.database import engine, SessionLocal
-from db.models import Balances
+from db.models import Balance
 
 
 class BalancesRepository:
@@ -11,7 +11,7 @@ class BalancesRepository:
 
 
     def add_asset(self, asset):
-        balance = Balances(
+        balance = Balance(
             asset=asset,
             free=0,
             locked=0,
@@ -23,12 +23,12 @@ class BalancesRepository:
 
 
     def get_balance_by_asset(self, asset):
-        balance = self.session.query(Balances).filter_by(asset=asset).first()
+        balance = self.session.query(Balance).filter_by(asset=asset).first()
         return balance
 
 
     def set_balance(self, asset, **kwargs):
-        balance = self.session.query(Balances).filter_by(asset=asset).first()
+        balance = self.session.query(Balance).filter_by(asset=asset).first()
         if balance:
             for key, value in kwargs.items():
                 if hasattr(balance, key):
@@ -39,12 +39,12 @@ class BalancesRepository:
 
 
     def get_all_balances(self):
-        balances = self.session.query(Balances).all()
+        balances = self.session.query(Balance).all()
         return balances
 
 
     def delete_balance(self, asset):
-        balance = self.session.query(Balances).filter_by(asset=asset).first()
+        balance = self.session.query(Balance).filter_by(asset=asset).first()
         self.session.delete(balance)
         self.session.commit()
 

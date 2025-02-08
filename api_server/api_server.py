@@ -29,7 +29,13 @@ def read_items(
         skip: int = Query(0, alias="offset", ge=0),
         limit: int = Query(10, alias="limit", ge=1)
 ):
-    trades = db.query(Trade).offset(skip).limit(limit).all()
+    # Sortowanie po date_time malejąco
+    trades_query = db.query(Trade).order_by(Trade.date_time.desc())
+
+    # Pobranie danych z uwzględnieniem offset i limit
+    trades = trades_query.offset(skip).limit(limit).all()
+    # trades = db.query(Trade).offset(skip).limit(limit).all()
+
     total = db.query(Trade).count()
     return {
         "data": [{

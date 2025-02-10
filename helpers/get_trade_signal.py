@@ -4,7 +4,7 @@ Get trade signal module.
 """
 
 
-from constants import SWING_HIGH, SIGNAL_HIGH, SWING_LOW, SIGNAL_LOW, TradeSignal, Trend
+from constants import SWING_HIGH, SIGNAL_HIGH, SWING_LOW, SIGNAL_LOW, TradeSignal
 from helpers import get_rsi_signals
 
 
@@ -12,6 +12,7 @@ def get_trade_signal(trend, data, fractals):
     """
     Get trade signal based on RSI signal and trend.
 
+    :param fractals:
     :param trend: str: Trend.
     :param data: pandas.DataFrame: Data.
 
@@ -47,10 +48,10 @@ def get_trade_signal(trend, data, fractals):
                   '| RSI signal LOW:', rsi_signals[SIGNAL_LOW]
                   )
 
-    if rsi_signals[SWING_HIGH] and rsi_signals[SIGNAL_HIGH] and trend == Trend.BEARISH:
+    if rsi_signals[SWING_HIGH] and rsi_signals[SIGNAL_HIGH]: # and trend == Trend.BEARISH:
         return TradeSignal.SELL
 
-    if rsi_signals[SWING_LOW] and rsi_signals[SIGNAL_LOW] and trend == Trend.BULLISH:
+    if rsi_signals[SWING_LOW] and rsi_signals[SIGNAL_LOW]: # and trend == Trend.BULLISH:
         return TradeSignal.BUY
 
     return TradeSignal.NONE

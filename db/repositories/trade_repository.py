@@ -6,7 +6,8 @@ from constants import Side
 from db.database import engine, SessionLocal
 from db.models.trade_model import Trade
 
-TP_SL_FACTOR = 3
+TP_SL_FACTOR = 4
+TP_SL = 5
 
 class TradeRepository:
     def __init__(self):
@@ -35,9 +36,12 @@ class TradeRepository:
             quantity=quantity,
             rest_quantity=quantity,
             atr=atr,
-            stop_loss=round(price - atr if side == Side.BUY else price + atr, 2),
-            take_profit_partial=round(price + atr if side == Side.BUY else price - atr, 2),
-            take_profit=round(price + atr * TP_SL_FACTOR if side == Side.BUY else price - atr * TP_SL_FACTOR, 2),
+            # stop_loss=round(price - atr if side == Side.BUY else price + atr, 2),
+            # take_profit_partial=round(price + atr if side == Side.BUY else price - atr, 2),
+            # take_profit=round(price + atr * TP_SL_FACTOR if side == Side.BUY else price - atr * TP_SL_FACTOR, 2),
+            stop_loss=round(price - TP_SL if side == Side.BUY else price + TP_SL, 2),
+            take_profit_partial=round(price + TP_SL if side == Side.BUY else price - TP_SL, 2),
+            take_profit=round(price + TP_SL * TP_SL_FACTOR if side == Side.BUY else price - TP_SL * TP_SL_FACTOR, 2),
             created_at=datetime.now(),
             updated_at=datetime.now()
         )
@@ -107,6 +111,14 @@ class TradeRepository:
         if trade:
             self.session.delete(trade)
             self.session.commit()
+
+
+    def delete_all_trades(self):
+        """
+        Usuwa wszystkie transakcje.
+        """
+        self.session.query(Trade).delete()
+        self.session.commit()
 
 
     def close(self):

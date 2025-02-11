@@ -6,7 +6,7 @@ from constants import Side
 from db.database import engine, SessionLocal
 from db.models.trade_model import Trade
 
-TP_SL_FACTOR = 4
+TP_SL_FACTOR = 3
 TP_SL = 5
 
 class TradeRepository:

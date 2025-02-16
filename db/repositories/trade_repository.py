@@ -6,9 +6,10 @@ This module contains the TradeRepository class for managing trade operations in 
 from dataclasses import dataclass
 from datetime import datetime
 
+from sqlalchemy import case
 from sqlalchemy.exc import SQLAlchemyError
 
-from constants import Side
+from constants import Side, TradeStatus
 from db.database import engine, SessionLocal
 from db.models.trade_model import Trade
 
@@ -148,6 +149,30 @@ class TradeRepository:
         """
         self.session.query(Trade).delete()
         self.session.commit()
+
+
+    def repair_trade_status(self):
+        """
+        Aktualizuje status transakcji w bazie danych na podstawie warunków:
+        - 'CLOSED', jeśli is_closed == 1
+        - 'PARTIAL', jeśli is_closed == 0 i take_profit_datetime nie jest puste
+        - 'OPEN' w pozostałych przypadkach
+        """
+        try:
+            self.session.query(Trade).update(
+                {
+                    Trade.status: case(
+                (Trade.is_closed == 1, TradeStatus.CLOSED.name),
+                        ((Trade.is_closed == 0) & (Trade.take_profit_partial_date_time.isnot(None)), TradeStatus.PARTIAL.name),
+                        else_=TradeStatus.OPEN.name
+                    )
+                },
+                synchronize_session=False
+            )
+            self.session.commit()
+        except SQLAlchemyError as e:
+            print(f"Błąd podczas aktualizacji statusów transakcji: {e}")
+            self.session.rollback()
 
 
     def close(self):

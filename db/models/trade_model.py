@@ -57,7 +57,7 @@ class Trade(Base):
     close_price = Column(Float)
     profit = Column(Float)
     is_closed = Column(Boolean, default=False)
-    status = Column(Enum(TradeStatus), nullable=False)
+    status = Column(Enum(TradeStatus), nullable=False, default=TradeStatus.NONE)
     close_date_time = Column(DateTime)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)

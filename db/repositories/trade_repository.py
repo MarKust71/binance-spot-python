@@ -70,6 +70,7 @@ class TradeRepository:
                 else trade_data.price - TP_SL * TP_SL_FACTOR,
                 2
             ),
+            'status': TradeStatus.OPEN.name,
             'created_at': datetime.now(),
             'updated_at': datetime.now()
         }

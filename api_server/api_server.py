@@ -77,6 +77,7 @@ def read_items(
             "close_price": trade.close_price,
             "profit": trade.profit,
             "is_closed": trade.is_closed,
+            "status": trade.status,
             "close_date_time": trade.close_date_time,
             "created_at": trade.created_at,
             "updated_at": trade.updated_at}

@@ -4,7 +4,7 @@ This module updates trades in the database based on the given symbol, price, and
 
 import pandas as pd
 
-from constants import Reason
+from constants import Reason, TradeStatus
 from db.repositories import TradeRepository
 
 from .determine_trade_outcome import determine_trade_outcome
@@ -44,6 +44,9 @@ def db_update_trades(symbol: str, price: float, timestamp: pd.Timestamp) -> None
         trades_repo.update_trade(
             trade.id,
             is_closed=reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT},
+            status=TradeStatus.CLOSED.name if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT}
+            else TradeStatus.PARTIAL if reason == Reason.TAKE_PROFIT_PARTIAL
+            else trade.status,
             close_price=price if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT}
             else trade.close_price,
             close_date_time=timestamp if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT}

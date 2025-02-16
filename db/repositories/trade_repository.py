@@ -70,7 +70,7 @@ class TradeRepository:
                 else trade_data.price - TP_SL * TP_SL_FACTOR,
                 2
             ),
-            'status': TradeStatus.OPEN.name,
+            'status': TradeStatus.OPEN,
             'created_at': datetime.now(),
             'updated_at': datetime.now()
         }
@@ -163,12 +163,12 @@ class TradeRepository:
             self.session.query(Trade).update(
                 {
                     Trade.status: case(
-                (Trade.is_closed == 1, TradeStatus.CLOSED.name),
+                (Trade.is_closed == 1, TradeStatus.CLOSED),
                         ((Trade.is_closed == 0)
                          & (
                              Trade.take_profit_partial_date_time.isnot(None)
-                         ), TradeStatus.PARTIAL.name),
-                        else_=TradeStatus.OPEN.name
+                         ), TradeStatus.PARTIAL),
+                        else_=TradeStatus.OPEN
                     )
                 },
                 synchronize_session=False

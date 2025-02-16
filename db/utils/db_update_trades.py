@@ -44,7 +44,7 @@ def db_update_trades(symbol: str, price: float, timestamp: pd.Timestamp) -> None
         trades_repo.update_trade(
             trade.id,
             is_closed=reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT},
-            status=TradeStatus.CLOSED.name if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT}
+            status=TradeStatus.CLOSED if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT}
             else TradeStatus.PARTIAL if reason == Reason.TAKE_PROFIT_PARTIAL
             else trade.status,
             close_price=price if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT}

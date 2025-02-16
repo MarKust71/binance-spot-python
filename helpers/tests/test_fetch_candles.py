@@ -21,8 +21,9 @@ class TestFetchCandles(unittest.TestCase):
         """
         # Mock data with at least 14 rows
         mock_get_klines.return_value = [
-                                           [1609459200000, "29000.0", "29500.0", "28500.0", "29000.0", "1000",
-                                            1609462800000, "29000000", 100, "500", "14500000", "0"]
+                                           [1609459200000, "29000.0", "29500.0", "28500.0",
+                                            "29000.0", "1000", 1609462800000, "29000000",
+                                            100, "500", "14500000", "0"]
                                        ] * 14
 
         result = fetch_candles('BTCUSDT', '1h', 14, end_time=None)
@@ -37,7 +38,7 @@ class TestFetchCandles(unittest.TestCase):
         Test fetch_candles function for handling API errors.
         """
         # Simulate an exception
-        mock_get_klines.side_effect = Exception("API error")
+        mock_get_klines.side_effect = ValueError("API error")
 
         result = fetch_candles('BTCUSDT', '1h', 1, end_time=None)
         self.assertTrue(result.empty)

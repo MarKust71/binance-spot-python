@@ -5,7 +5,7 @@ This module defines the Trade model for representing trades in the database.
 
 from datetime import datetime
 from sqlalchemy import Column, Integer, DateTime, String, Float, Enum, Boolean
-from constants import Side
+from constants import Side, TradeStatus
 
 from db.models.models import Base
 
@@ -33,6 +33,7 @@ class Trade(Base):
         close_price (float): The closing price of the trade.
         profit (float): The profit of the trade.
         is_closed (bool): Indicates if the trade is closed.
+        status (TradeStatus): Trade status
         close_date_time (datetime): The date and time when the trade was closed.
         created_at (datetime): The date and time when the trade was created.
         updated_at (datetime): The date and time when the trade was last updated.
@@ -56,9 +57,11 @@ class Trade(Base):
     close_price = Column(Float)
     profit = Column(Float)
     is_closed = Column(Boolean, default=False)
+    status = Column(Enum(TradeStatus), nullable=False)
     close_date_time = Column(DateTime)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
+
 
     def __repr__(self):
         return (f"<Trades(id={self.id}, date_time={self.date_time}, symbol={self.symbol}, "
@@ -69,8 +72,10 @@ class Trade(Base):
                 f"take_profit_partial_price={self.take_profit_partial_price}, "
                 f"take_profit_partial_quantity={self.take_profit_partial_quantity}, "
                 f"take_profit_partial_date_time={self.take_profit_partial_date_time}, "
-                f"is_closed={self.is_closed}, close_date_time={self.close_date_time}, "
-                f"created_at={self.created_at}, updated_at={self.updated_at})>")
+                f"is_closed={self.is_closed}, status={self.status}, "
+                f"close_date_time={self.close_date_time}, created_at={self.created_at}, "
+                f"updated_at={self.updated_at})>")
+
 
     def as_dict(self):
         """
@@ -95,6 +100,7 @@ class Trade(Base):
             'take_profit_partial_quantity': self.take_profit_partial_quantity,
             'take_profit_partial_date_time': self.take_profit_partial_date_time,
             'is_closed': self.is_closed,
+            'status': self.status,
             'close_date_time': self.close_date_time,
             'created_at': self.created_at,
             'updated_at': self.updated_at

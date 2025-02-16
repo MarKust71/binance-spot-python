@@ -59,8 +59,7 @@ def fetch_candles(symbol, interval, limit, end_time) -> pd.DataFrame:
 
         return data_frame
 
-    # except Exception as e:
-    except (ValueError, KeyError, TypeError) as e:
+    except (ValueError, KeyError, TypeError, Exception) as e:
         print(f"Błąd podczas pobierania świec: {e}")
 
         return pd.DataFrame()
@@ -82,6 +81,5 @@ if __name__ == '__main__':
         else:
             print("Nie udało się pobrać danych.")
 
-    # except Exception as e:
     except (ValueError, KeyError, TypeError) as e:
         print(f"Błąd podczas pobierania świec: {e}")

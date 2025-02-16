@@ -1,8 +1,9 @@
 .idea
 .env
-.csv
-.db
-.sqlite
+*.csv
+*.db
+*.sqlite
 .venv
 venv
 __pycache__
+alembic/versions/*

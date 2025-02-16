@@ -13,9 +13,7 @@ def detect_fractals(data, periods):
 
     Args:
         data (pd.DataFrame): The input data containing 'high' and 'low' columns.
-        fractal_col (str): The column name for the fractal to be checked.
-        opposite_fractal_col (str): The column name for the opposite fractal.
-        comparison_op (function): A function that compares two fractal values.
+        periods (int): The number of periods to consider for detecting fractals.
 
     Returns:
         pd.DataFrame: The data with redundant fractals removed.
@@ -37,7 +35,9 @@ def remove_redundant_fractals(data, fractal_col, opposite_fractal_col, compariso
 
     Args:
         data (pd.DataFrame): The input data containing 'high' and 'low' columns.
-        periods (int): The number of periods to consider for detecting fractals.
+        fractal_col (str): The column name of the fractal to detect.
+        opposite_fractal_col (str): The column name of the opposite fractal.
+        comparison_op (function): The comparison operation to use for detecting redundant fractals.
 
     Returns:
         pd.DataFrame: The data with detected fractals.

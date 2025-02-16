@@ -25,7 +25,7 @@ def get_open_orders(symbol) -> list:
 
         return orders
 
-    except Exception as e:
+    except (ValueError, KeyError, TypeError) as e:
         print(f"Błąd podczas pobierania otwartych zleceń: {e}")
 
     return []

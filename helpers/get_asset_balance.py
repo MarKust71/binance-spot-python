@@ -24,7 +24,8 @@ def get_asset_balance(asset=None) -> dict:
 
         return assets
 
-    except Exception as e:
+    # except Exception as e:
+    except (ValueError, KeyError, TypeError) as e:
         print(f"Błąd podczas pobierania zleceń: {e}")
 
     return {}

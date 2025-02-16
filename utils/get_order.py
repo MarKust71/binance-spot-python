@@ -5,10 +5,9 @@ Get order module.
 
 
 import pprint
-
+from requests.exceptions import HTTPError, ConnectionError as RequestsConnectionError, Timeout
 from api import client
 from constants import TRADE_SYMBOL
-
 
 def get_order(symbol, order_id) -> list:
     """
@@ -23,11 +22,11 @@ def get_order(symbol, order_id) -> list:
     """
     try:
         order = client.get_order(symbol=symbol, orderId=order_id)
-
         return order
-
-    except Exception as e:
-        print(f"Błąd podczas pobierania zlecenia: {e}")
+    except (HTTPError, RequestsConnectionError, Timeout) as e:
+        print(f"Error while fetching order: {e}")
+    except (ValueError, KeyError, TypeError) as e:
+        print(f"An unexpected error occurred: {e}")
 
     return []
 

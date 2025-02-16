@@ -58,5 +58,6 @@ class TestFetchCandles(unittest.TestCase):
         result = fetch_candles('BTCUSDT', '1h', 1, end_time=None)
         self.assertIsNone(result)
 
+
 if __name__ == '__main__':
     unittest.main()

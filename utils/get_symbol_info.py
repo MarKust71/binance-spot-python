@@ -25,7 +25,7 @@ def get_symbol_info(symbol) -> list:
 
         return symbol_info
 
-    except Exception as e:
+    except (ValueError, KeyError, TypeError) as e:
         print(f"Błąd podczas pobierania informacji: {e}")
 
     return []

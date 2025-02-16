@@ -22,6 +22,9 @@ KLINE_TREND_INTERVAL = KLINE_INTERVAL_5MINUTE
 
 # Trend
 class Trend(enum.Enum):
+    """
+    Enum representing different market trends.
+    """
     BULLISH = "bullish"
     BEARISH = "bearish"
     NONE = "none"
@@ -37,17 +40,26 @@ SIGNAL_LOW = "signal_low"
 
 # Side
 class Side(enum.Enum):
+    """
+    Enum representing the sides of a trade.
+    """
     SELL = "sell"
     BUY = "buy"
 
 # Trade signals
 class TradeSignal(enum.Enum):
+    """
+    Enum representing different trade signals.
+    """
     SELL = "sell"
     BUY = "buy"
     NONE = "none"
 
 # Reason
 class Reason(enum.Enum):
+    """
+    Enum representing the reasons of updating order.
+    """
     STOP_LOSS = "STOP LOSS"
     TAKE_PROFIT = "TAKE PROFIT"
     TAKE_PROFIT_PARTIAL = "TAKE PROFIT PARTIAL"

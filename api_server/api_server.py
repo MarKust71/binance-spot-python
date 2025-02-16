@@ -1,7 +1,13 @@
+"""
+This module initializes the FastAPI application and defines the API endpoints
+for interacting with the trades database. It includes functionality for
+pagination and sorting of trade data.
+"""
+
+
 from fastapi import FastAPI, Depends, Query
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
-# from typing import List
 
 from db.database import DATABASE_URL
 from db.models import Trade
@@ -16,6 +22,11 @@ app = FastAPI()
 
 # Funkcja zależności do pobierania sesji
 def get_db():
+    """
+    Dependency function that provides a database session.
+    Yields:
+        db (Session): SQLAlchemy database session.
+    """
     db = SessionLocal()
     try:
         yield db
@@ -29,12 +40,22 @@ def read_items(
         skip: int = Query(0, alias="offset", ge=0),
         limit: int = Query(10, alias="limit", ge=1)
 ):
+    """
+    Retrieves trade data from the database with pagination and sorting.
+
+    Args:
+        db (Session): SQLAlchemy database session.
+        skip (int): Number of records to skip for pagination.
+        limit (int): Maximum number of records to return.
+
+    Returns:
+        dict: A dictionary containing trade data and pagination information.
+    """
     # Sortowanie po date_time malejąco
     trades_query = db.query(Trade).order_by(Trade.date_time.desc())
 
     # Pobranie danych z uwzględnieniem offset i limit
     trades = trades_query.offset(skip).limit(limit).all()
-    # trades = db.query(Trade).offset(skip).limit(limit).all()
 
     total = db.query(Trade).count()
     return {
@@ -68,12 +89,12 @@ def read_items(
         }
     }
 
-# Uruchomienie serwera komendą:
-# uvicorn script_name:app --reload --host 0.0.0.0 --port 8000
-#
-# http://127.0.0.1:8000/items/?offset=0&limit=5
-
 
 if __name__ == '__main__':
+    # Uruchomienie serwera komendą:
+    # uvicorn script_name:app --reload --host 0.0.0.0 --port 8000
+    #
+    # http://127.0.0.1:8000/items/?offset=0&limit=5
+
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

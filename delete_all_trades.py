@@ -1,3 +1,8 @@
+"""
+This module deletes all trades from the database.
+"""
+
+
 from db.utils.db_delete_all_trades import db_delete_all_trades
 
 

@@ -1,3 +1,8 @@
+"""
+This module provides the BalancesRepository class for managing balances in the database.
+"""
+
+
 from datetime import datetime
 
 from db.database import engine, SessionLocal
@@ -5,12 +10,21 @@ from db.models import Balance
 
 
 class BalancesRepository:
+    """
+    Repository class for managing balances in the database.
+    Provides methods to add, retrieve, update, and delete balances.
+    """
     def __init__(self):
         self.engine = engine
         self.session = SessionLocal()
 
 
     def add_asset(self, asset):
+        """
+        Adds a new asset with initial balance to the database.
+
+        :param asset: The asset to be added
+        """
         balance = Balance(
             asset=asset,
             free=0,
@@ -23,11 +37,23 @@ class BalancesRepository:
 
 
     def get_balance_by_asset(self, asset):
+        """
+        Retrieves the balance for a given asset from the database.
+
+        :param asset: The asset whose balance is to be retrieved
+        :return: The balance of the specified asset
+        """
         balance = self.session.query(Balance).filter_by(asset=asset).first()
         return balance
 
 
     def set_balance(self, asset, **kwargs):
+        """
+        Updates the balance for a given asset with the provided key-value pairs.
+
+        :param asset: The asset to update the balance for
+        :param kwargs: Key-value pairs of balance attributes to update (e.g., free=100)
+        """
         balance = self.session.query(Balance).filter_by(asset=asset).first()
         if balance:
             for key, value in kwargs.items():
@@ -35,15 +61,24 @@ class BalancesRepository:
                     setattr(balance, key, value)
             balance.updated_at = datetime.now()
             self.session.commit()
-        pass
 
 
     def get_all_balances(self):
+        """
+        Retrieves all balances from the database.
+
+        :return: A list of all balances
+        """
         balances = self.session.query(Balance).all()
         return balances
 
 
     def delete_balance(self, asset):
+        """
+        Deletes the balance for a given asset from the database.
+
+        :param asset: The asset whose balance is to be deleted
+        """
         balance = self.session.query(Balance).filter_by(asset=asset).first()
         self.session.delete(balance)
         self.session.commit()
@@ -55,8 +90,6 @@ class BalancesRepository:
 
 
 if __name__ == '__main__':
-    pass
-
     repo = BalancesRepository()
 
     # Dodanie przykładowego salda

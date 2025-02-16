@@ -1,3 +1,8 @@
+"""
+This module determines the outcome of a trade based on the given price.
+"""
+
+
 from constants import Reason, Side
 
 

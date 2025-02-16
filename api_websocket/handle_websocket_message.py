@@ -1,4 +1,4 @@
-# api/handle_websocket_message.py
+# api_websocket/handle_websocket_message.py
 """
 Binance handle websocket message module.
 """
@@ -16,7 +16,6 @@ TREND_LIMIT = 200
 DELAY = 0
 FRACTALS_PERIODS = 8
 
-LAST_CLOSE = None
 
 def handle_websocket_message(message) -> None:
     """
@@ -28,15 +27,16 @@ def handle_websocket_message(message) -> None:
     Returns:
         None
     """
-
-
-    global LAST_CLOSE
+    if not hasattr(handle_websocket_message, 'LAST_CLOSE'):
+        handle_websocket_message.LAST_CLOSE = None
 
     json_message = json.loads(message)
     event_time = pd.to_datetime(json_message['E'], unit='ms')
     # kline = json_message['k']
 
-    candles = fetch_candles(symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, end_time=None)
+    candles = fetch_candles(
+        symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, end_time=None
+    )
     trend_candles = fetch_candles(
         symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=TREND_LIMIT, end_time=None
     )
@@ -45,9 +45,8 @@ def handle_websocket_message(message) -> None:
     close_price = candles['close'].to_numpy()[-1]
     is_candle_closed = close_time < event_time
 
-    if is_candle_closed and LAST_CLOSE != close_time:
-
-        LAST_CLOSE = close_time
+    if is_candle_closed and handle_websocket_message.LAST_CLOSE != close_time:
+        handle_websocket_message.LAST_CLOSE = close_time
         print(f'Candle closed: {close_time} | price: {close_price:,.2f}')
 
         new_trade_id = db_add_trade(

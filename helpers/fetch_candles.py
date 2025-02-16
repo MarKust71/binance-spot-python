@@ -1,14 +1,12 @@
-# helpers/determine_trend.py
+"""
+This module provides functions to fetch candlestick data from a financial API and process it.
+"""
 
-# import talib
-# import btalib
+
+from datetime import datetime
 import ta
 import pandas as pd
-# import pandas_ta as ta
-
-# from numpy import nan as npNaN
 from api import client
-from datetime import datetime
 
 
 # Funkcja pobierania danych świecowych
@@ -61,16 +59,16 @@ def fetch_candles(symbol, interval, limit, end_time) -> pd.DataFrame:
 
         return data_frame
 
-    except Exception as e:
+    # except Exception as e:
+    except (ValueError, KeyError, TypeError) as e:
         print(f"Błąd podczas pobierania świec: {e}")
 
         return pd.DataFrame()
 
 
 if __name__ == '__main__':
-    pass
-    date_string = '2025-01-25 12:00:59.999000'
-    date_object = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S.%f')
+    DATE_STRING = '2025-01-25 12:00:59.999000'
+    date_object = datetime.strptime(DATE_STRING, '%Y-%m-%d %H:%M:%S.%f')
     timestamp = int(date_object.timestamp() * 1000)
     print(timestamp)
 
@@ -84,5 +82,6 @@ if __name__ == '__main__':
         else:
             print("Nie udało się pobrać danych.")
 
-    except Exception as e:
+    # except Exception as e:
+    except (ValueError, KeyError, TypeError) as e:
         print(f"Błąd podczas pobierania świec: {e}")

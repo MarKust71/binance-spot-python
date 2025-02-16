@@ -27,7 +27,7 @@ def create_order(side, quantity, symbol, order_type=ORDER_TYPE_MARKET) -> bool:
         print("sending order")
         order = client.create_order(symbol=symbol, side=side, type=order_type, quantity=quantity)
         print(order)
-    except Exception as e:
+    except (ValueError, KeyError, TypeError) as e:
         print(f"an exception occurred - {format(e)}")
         return False
 

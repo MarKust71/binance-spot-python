@@ -163,7 +163,10 @@ class TradeRepository:
                 {
                     Trade.status: case(
                 (Trade.is_closed == 1, TradeStatus.CLOSED.name),
-                        ((Trade.is_closed == 0) & (Trade.take_profit_partial_date_time.isnot(None)), TradeStatus.PARTIAL.name),
+                        ((Trade.is_closed == 0)
+                         & (
+                             Trade.take_profit_partial_date_time.isnot(None)
+                         ), TradeStatus.PARTIAL.name),
                         else_=TradeStatus.OPEN.name
                     )
                 },

@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 from constants import TradeSignal, TRADE_VALUE, TRADE_SYMBOL, Side
-from db.repositories import TradeRepository
+from db.repositories import TradeRepository, TradeData
 from helpers import set_fractals, determine_trend, get_trade_signal
 
 
@@ -50,7 +50,7 @@ def db_add_trade(
         print(f'QTY: {quantity}')
 
         trades_repo = TradeRepository()
-        new_trade_id = trades_repo.add_trade(
+        trade_data = TradeData(
             date_time=candles['timestamp'].iloc[-1],
             symbol=TRADE_SYMBOL,
             side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
@@ -58,6 +58,7 @@ def db_add_trade(
             quantity=quantity,
             atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
         )
+        new_trade_id = trades_repo.add_trade(trade_data)
         trades_repo.close()
 
         if trade_signal == TradeSignal.SELL:

@@ -11,12 +11,12 @@ from api_websocket.handle_websocket_message import handle_websocket_message
 from constants import API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL
 
 
-def on_error(ws, error) -> None:
+def on_error(_ws, error) -> None:
     """
     This function does something.
 
     Args:
-        ws: Description of param1.
+        _ws: Description of param1.
         error: Description of param2.
 
     Returns:
@@ -25,12 +25,12 @@ def on_error(ws, error) -> None:
     print('KLINES-> error', error)
 
 
-def on_open(ws) -> None:
+def on_open(_ws) -> None:
     """
     This function does something.
 
     Args:
-        ws: Description of param1.
+        _ws: Description of param1.
 
     Returns:
         None
@@ -38,12 +38,12 @@ def on_open(ws) -> None:
     print('KLINES-> connection opened')
 
 
-def on_close(ws, status_code, close_msg) -> None:
+def on_close(_ws, status_code, close_msg) -> None:
     """
     This function does something.
 
     Args:
-        ws: Description of param1.
+        _ws: Description of param1.
         status_code: Description of param1.
         close_msg: Description of param1.
 
@@ -53,12 +53,12 @@ def on_close(ws, status_code, close_msg) -> None:
     print(f'KLINES-> connection closed: status code: {status_code}, message: {close_msg}')
 
 
-def on_message(ws, message) -> None:
+def on_message(_ws, message) -> None:
     """
     This function does something.
 
     Args:
-        ws: Description of param1.
+        _ws: Description of param1.
         message: Description of param1.
 
     Returns:
@@ -88,5 +88,5 @@ def ws_kline(url: str, symbol: str, interval: str) -> WebSocketApp:
 
 
 if __name__ == '__main__':
-    ws = ws_kline(API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL)
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+    websocket = ws_kline(API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL)
+    websocket.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})

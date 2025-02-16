@@ -5,6 +5,15 @@ Calculate RSI signals module.
 
 
 def get_rsi_signals(rsi: list) -> dict:
+    """
+    Calculates RSI signals based on the given RSI values.
+
+    Args:
+        rsi (list): A list of RSI values.
+
+    Returns:
+        dict: A dictionary containing RSI signals.
+    """
     rsi_signals = {
         "swing_high": rsi[-2] > rsi[-1] and rsi[-2] > rsi[-3],
         "swing_low": rsi[-2] < rsi[-1] and rsi[-2] < rsi[-3],

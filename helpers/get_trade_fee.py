@@ -25,7 +25,7 @@ def get_trade_fee(symbol=None) -> list:
 
         return fee
 
-    except Exception as e:
+    except (ValueError, KeyError, TypeError) as e:
         print(f"Błąd podczas pobierania opłat: {e}")
 
     return []

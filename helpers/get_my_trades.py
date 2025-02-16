@@ -25,7 +25,7 @@ def get_my_trades(symbol) -> list:
 
         return trades
 
-    except Exception as e:
+    except (ValueError, KeyError, TypeError) as e:
         print(f"Błąd podczas pobierania zleceń: {e}")
 
     return []

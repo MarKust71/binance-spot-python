@@ -1,3 +1,9 @@
+"""
+This module contains the TradeRepository class for managing trade operations in the database.
+"""
+
+
+from dataclasses import dataclass
 from datetime import datetime
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -9,42 +15,65 @@ from db.models.trade_model import Trade
 TP_SL_FACTOR = 3
 TP_SL = 5
 
+
+@dataclass
+class TradeData:
+    """
+    A data class representing the details of a trade.
+    """
+    date_time: datetime
+    symbol: str
+    side: Side
+    price: float
+    quantity: float
+    atr: float
+
+
 class TradeRepository:
+    """
+    A repository class for managing trade operations in the database.
+    """
     def __init__(self):
         """Inicjalizacja repozytorium"""
         self.engine = engine
         self.session = SessionLocal()
 
 
-    def add_trade(
-            self,
-            date_time: datetime,
-            symbol: str,
-            side: Side,
-            price: float,
-            quantity: float,
-            atr: float
-    ) -> int | None:
+    def add_trade(self, trade_data: TradeData) -> int | None:
         """
         Dodaje nową transakcję do bazy danych.
         """
-        trade = Trade(
-            date_time=date_time,
-            symbol=symbol,
-            side=side,
-            price=price,
-            quantity=quantity,
-            rest_quantity=quantity,
-            atr=atr,
-            # stop_loss=round(price - atr if side == Side.BUY else price + atr, 2),
-            # take_profit_partial=round(price + atr if side == Side.BUY else price - atr, 2),
-            # take_profit=round(price + atr * TP_SL_FACTOR if side == Side.BUY else price - atr * TP_SL_FACTOR, 2),
-            stop_loss=round(price - TP_SL if side == Side.BUY else price + TP_SL, 2),
-            take_profit_partial=round(price + TP_SL if side == Side.BUY else price - TP_SL, 2),
-            take_profit=round(price + TP_SL * TP_SL_FACTOR if side == Side.BUY else price - TP_SL * TP_SL_FACTOR, 2),
-            created_at=datetime.now(),
-            updated_at=datetime.now()
-        )
+        trade_args = {
+            'date_time': trade_data.date_time,
+            'symbol': trade_data.symbol,
+            'side': trade_data.side,
+            'price': trade_data.price,
+            'quantity': trade_data.quantity,
+            'rest_quantity': trade_data.quantity,
+            'atr': trade_data.atr,
+            'stop_loss': round(
+                trade_data.price - TP_SL
+                if trade_data.side == Side.BUY
+                else trade_data.price + TP_SL,
+                2
+            ),
+            'take_profit_partial': round(
+                trade_data.price + TP_SL
+                if trade_data.side == Side.BUY
+                else trade_data.price - TP_SL,
+                2
+            ),
+            'take_profit': round(
+                trade_data.price + TP_SL * TP_SL_FACTOR
+                if trade_data.side == Side.BUY
+                else trade_data.price - TP_SL * TP_SL_FACTOR,
+                2
+            ),
+            'created_at': datetime.now(),
+            'updated_at': datetime.now()
+        }
+
+        trade = Trade(**trade_args)
         self.session.add(trade)
 
         try:

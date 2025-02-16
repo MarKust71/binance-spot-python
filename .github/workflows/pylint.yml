@@ -20,6 +20,7 @@ jobs:
       run: sudo dpkg -i ta-lib_0.6.4_amd64.deb
     - name: Install dependencies
       run: |
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         python -m pip install --upgrade pip
         pip install pylint
     - name: Analysing the code with pylint

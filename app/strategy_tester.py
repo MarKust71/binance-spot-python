@@ -14,13 +14,11 @@ TREND_LIMIT = 1000
 FRACTALS_PERIODS = 8
 DELAY = 0
 
+
 def strategy_tester():
     """
     Strategy tester function.
     """
-    pass
-
-
     candles = fetch_candles(
         symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, end_time=None
     )
@@ -29,14 +27,13 @@ def strategy_tester():
     )
 
     # tc = set_fractals(trend_candles, periods=FRACTALS_PERIODS)
-    # fr = tc[tc['Fractal_Up'].notnull() | tc['Fractal_Down'].notnull()][['timestamp', 'Fractal_Down', 'Fractal_Up']]
+    # fr = tc[tc['Fractal_Up'].notnull() | tc['Fractal_Down'].notnull()][['timestamp',
+    # 'Fractal_Down', 'Fractal_Up']]
     # print(fr)
     # fr.to_csv('fractals.csv')
 
     # candles.to_csv('candles.csv')
     # trend_candles.to_csv('trend_candles.csv')
-
-
 
     for i in range(0, len(candles) - SCOPE + 1):
 

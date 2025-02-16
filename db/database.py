@@ -1,6 +1,11 @@
+"""
+Database configuration and setup module.
+"""
+
+
+from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from pathlib import Path
 
 from db.models.models import Base
 

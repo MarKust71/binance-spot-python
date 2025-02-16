@@ -1,0 +1,4 @@
+[MASTER]
+ignore-paths=alembic/versions/.*
+recursive=yes
+verbose=1

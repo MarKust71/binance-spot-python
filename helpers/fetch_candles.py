@@ -39,18 +39,6 @@ def fetch_candles(symbol, interval, limit, end_time) -> pd.DataFrame:
         data_frame['close'] = data_frame['close'].astype(float)
         data_frame['volume'] = data_frame['volume'].astype(float)
 
-        # talib
-        # data_frame['atr'] = talib.ATR(data_frame['high'].to_numpy(), data_frame['low'].to_numpy(),
-        #                               data_frame['close'].to_numpy(), timeperiod=14)
-        # data_frame['rsi'] = talib.RSI(data_frame['close'].to_numpy(), timeperiod=14)
-        # data_frame['sma'] = talib.SMA(data_frame['rsi'].to_numpy(), timeperiod=14)
-
-        # pandas_ta
-        # data_frame['atr'] = ta.atr(data_frame['high'].to_numpy(), data_frame['low'].to_numpy(),
-        #                               data_frame['close'].to_numpy(), length=14)
-        # data_frame['rsi'] = ta.rsi(data_frame['close'].to_numpy(), length=14)
-        # data_frame['sma'] = ta.sma(data_frame['rsi'].to_numpy(), length=14)
-
         # ta
         data_frame['atr'] = ta.wrapper.AverageTrueRange(data_frame['high'], data_frame['low'],
                                       data_frame['close'], window=14).average_true_range()

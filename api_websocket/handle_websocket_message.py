@@ -9,7 +9,7 @@ import pandas as pd
 
 from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL
 from db.utils import db_add_trade
-from helpers import fetch_candles
+from helpers import fetch_candles, get_rsi_signals
 
 LIMIT = 200
 TREND_LIMIT = 200
@@ -42,12 +42,20 @@ def handle_websocket_message(message) -> None:
     )
 
     close_time = pd.to_datetime(candles['close_time'].to_numpy()[-1], unit='ms')
-    close_price = candles['close'].to_numpy()[-1]
     is_candle_closed = close_time < event_time
 
     if is_candle_closed and handle_websocket_message.LAST_CLOSE != close_time:
         handle_websocket_message.LAST_CLOSE = close_time
-        print(f'Candle closed: {close_time} | price: {close_price:,.2f}')
+        close_price = candles['close'].to_numpy()[-1]
+        rsi = candles['rsi'].to_numpy()[-1]
+        rsi_signals = get_rsi_signals(candles['rsi'].to_numpy())
+        print(
+            f'Candle closed: {close_time} '
+            f'| price: {close_price:,.2f} '
+            f'| RSI: {rsi:.2f} '
+            f'{">>>" if rsi_signals["swing_high"] and rsi_signals["signal"] else ""}'
+            f'{"<<<" if rsi_signals["swing_low"] and rsi_signals["signal"] else ""}'
+        )
 
         new_trade_id = db_add_trade(
             candles=candles,

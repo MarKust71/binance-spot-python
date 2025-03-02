@@ -47,11 +47,16 @@ def handle_websocket_message(message) -> None:
     if is_candle_closed and handle_websocket_message.LAST_CLOSE != close_time:
         handle_websocket_message.LAST_CLOSE = close_time
         close_price = candles['close'].to_numpy()[-1]
+        open_price = candles['open'].to_numpy()[-1]
         rsi = candles['rsi'].to_numpy()[-1]
         rsi_signals = get_rsi_signals(candles['rsi'].to_numpy())
+
+        color = "\033[92m" if close_price > open_price else "\033[91m" \
+            if close_price < open_price else ""
+        reset_color = "\033[0m" if color else ""
         print(
             f'Candle closed: {close_time} '
-            f'| price: {close_price:,.2f} '
+            f'| price: {color}{close_price:,.2f}{reset_color} '
             f'| RSI: {rsi:.2f} '
             f'{">>>" if rsi_signals["swing_high"] and rsi_signals["signal"] else ""}'
             f'{"<<<" if rsi_signals["swing_low"] and rsi_signals["signal"] else ""}'

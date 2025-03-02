@@ -32,8 +32,8 @@ class BinanceWebSocket:
     def on_close(self, _ws, status_code, close_msg) -> None:
         """Handles WebSocket closure."""
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'\033[94mTRADES\033[0m-> connection closed at {timestamp}: status code: {status_code}, '
-              f'message: {close_msg}')
+        print(f'\033[94mTRADES\033[0m-> connection closed at {timestamp}: '
+              f'status code: {status_code}, message: {close_msg}')
 
         if self.last_open_time and (time.time() - self.last_open_time) >= 5:
             print("\033[93mTRADES\033[0m-> Reconnecting WebSocket...")

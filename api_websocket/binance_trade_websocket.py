@@ -21,22 +21,22 @@ class BinanceWebSocket:
 
     def on_error(self, _ws, error) -> None:
         """Handles WebSocket errors."""
-        print('TRADES-> error', error)
+        print(f'\033[91mTRADES\033[0m-> error {error}')
 
     def on_open(self, _ws) -> None:
         """Handles WebSocket opening."""
         self.last_open_time = time.time()
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'TRADES-> connection opened at {timestamp}')
+        print(f'\033[92mTRADES\033[0m-> connection opened at {timestamp}')
 
     def on_close(self, _ws, status_code, close_msg) -> None:
         """Handles WebSocket closure."""
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'TRADES-> connection closed at {timestamp}: status code: {status_code}, '
-              f'message: {close_msg}')
+        print(f'\033[94mTRADES\033[0m-> connection closed at {timestamp}: '
+              f'status code: {status_code}, message: {close_msg}')
 
         if self.last_open_time and (time.time() - self.last_open_time) >= 5:
-            print("TRADES-> Reconnecting WebSocket...")
+            print("\033[93mTRADES\033[0m-> Reconnecting WebSocket...")
             self.reconnect()
 
     def on_message(self, _ws, message) -> None:
@@ -46,7 +46,7 @@ class BinanceWebSocket:
     def create_websocket(self) -> WebSocketApp:
         """Creates a WebSocketApp instance."""
         socket = f"{self.url}/ws/{self.symbol.lower()}@trade"
-        print(f'TRADES-> socket: {socket}')
+        print(f'\033[92mTRADES\033[0m-> socket: {socket}')
 
         return WebSocketApp(
             socket,

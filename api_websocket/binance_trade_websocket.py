@@ -4,87 +4,71 @@ Binance websocket module.
 
 import ssl
 import time
-# import websocket
-
 from datetime import datetime
-
 from websocket import WebSocketApp
 from api_websocket.handle_trade_websocket_message import handle_trade_websocket_message
 from constants import API_WEBSOCKET_URL, TRADE_SYMBOL
 
-last_open_time = 0  # Przechowuje czas ostatniego otwarcia połączenia
-ws = None  # Globalna zmienna dla WebSocketApp
 
+class BinanceWebSocket:
+    """Class to manage Binance WebSocket connection."""
 
-def on_error(_ws, error) -> None:
-    """
-    Handles WebSocket errors.
+    def __init__(self, url: str, symbol: str):
+        self.url = url
+        self.symbol = symbol
+        self.last_open_time = None
+        self.ws = None
 
-    Args:
-        _ws: WebSocket instance.
-        error: Error message.
+    def on_error(self, _ws, error) -> None:
+        """Handles WebSocket errors."""
+        print('TRADES-> error', error)
 
-    Returns:
-        None
-    """
-    print('TRADES-> error', error)
+    def on_open(self, _ws) -> None:
+        """Handles WebSocket opening."""
+        self.last_open_time = time.time()
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f'TRADES-> connection opened at {timestamp}')
 
+    def on_close(self, _ws, status_code, close_msg) -> None:
+        """Handles WebSocket closure."""
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f'TRADES-> connection closed at {timestamp}: status code: {status_code}, '
+              f'message: {close_msg}')
 
-def on_open(_ws) -> None:
-    """
-    Handles WebSocket opening.
+        if self.last_open_time and (time.time() - self.last_open_time) >= 5:
+            print("TRADES-> Reconnecting WebSocket...")
+            self.reconnect()
 
-    Args:
-        _ws: WebSocket instance.
+    def on_message(self, _ws, message) -> None:
+        """Handles WebSocket messages."""
+        handle_trade_websocket_message(message)
 
-    Returns:
-        None
-    """
-    global last_open_time
-    last_open_time = time.time()  # Zapisujemy czas otwarcia połączenia
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(f'TRADES-> connection opened at {timestamp}')
+    def create_websocket(self) -> WebSocketApp:
+        """Creates a WebSocketApp instance."""
+        socket = f"{self.url}/ws/{self.symbol.lower()}@trade"
+        print(f'TRADES-> socket: {socket}')
 
+        return WebSocketApp(
+            socket,
+            on_open=self.on_open,
+            on_close=self.on_close,
+            on_message=self.on_message,
+            on_error=self.on_error,
+        )
 
-def on_close(_ws, status_code, close_msg) -> None:
-    """
-    Handles WebSocket closure.
+    def run(self):
+        """Starts the WebSocket connection."""
+        self.ws = self.create_websocket()
+        self.ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
-    Args:
-        _ws: WebSocket instance.
-        status_code: Closure status code.
-        close_msg: Closure message.
-
-    Returns:
-        None
-    """
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(f'TRADES-> connection closed at {timestamp}: status code: {status_code}, '
-          f'message: {close_msg}')
-
-    # Sprawdzamy, czy minęło co najmniej 5 sekund od ostatniego otwarcia
-    if last_open_time and (time.time() - last_open_time) >= 5:
-        print("TRADES-> Reconnecting WebSocket...")
-        reconnect()
-
-
-def on_message(_ws, message) -> None:
-    """
-    Handles WebSocket messages.
-
-    Args:
-        _ws: WebSocket instance.
-        message: Incoming message.
-
-    Returns:
-        None.
-    """
-    handle_trade_websocket_message(message)
+    def reconnect(self):
+        """Reconnects WebSocket."""
+        self.run()
 
 
 def ws_trade(url: str, symbol: str) -> WebSocketApp:
     """
-    Creates and returns a WebSocketApp instance.
+    Creates and returns a WebSocketApp instance, maintaining compatibility with previous imports.
 
     Args:
         url: WebSocket API base URL.
@@ -93,23 +77,9 @@ def ws_trade(url: str, symbol: str) -> WebSocketApp:
     Returns:
         WebSocketApp instance.
     """
-    socket = f"{url}/ws/{symbol.lower()}@trade"
-    print(f'TRADES-> socket: {socket}')
-
-    return WebSocketApp(
-        socket, on_open=on_open, on_close=on_close, on_message=on_message, on_error=on_error
-    )
-
-
-def reconnect():
-    """
-    Reconnects WebSocket.
-    """
-    global ws
-    ws = ws_trade(API_WEBSOCKET_URL, TRADE_SYMBOL)
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+    return BinanceWebSocket(url, symbol).create_websocket()
 
 
 if __name__ == '__main__':
-    ws = ws_trade(API_WEBSOCKET_URL, TRADE_SYMBOL)
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+    binance_ws = BinanceWebSocket(API_WEBSOCKET_URL, TRADE_SYMBOL)
+    binance_ws.run()

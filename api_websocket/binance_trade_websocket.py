@@ -63,6 +63,7 @@ class BinanceWebSocket:
 
     def reconnect(self):
         """Reconnects WebSocket."""
+        self.last_open_time = time.time()
         self.run()
 
 

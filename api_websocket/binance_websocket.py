@@ -31,7 +31,7 @@ def on_open(_ws) -> None:
     Handle WebSocket opening.
 
     Args:
-        ws: WebSocket instance.
+        _ws: WebSocket instance.
 
     Returns:
         None

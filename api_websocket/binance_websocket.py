@@ -28,19 +28,6 @@ class BinanceKlineWebSocket(BinanceWebSocketBase):
         }
         self.ws.send(json.dumps(payload))
 
-    def create_websocket(self) -> WebSocketApp:
-        """Creates a WebSocketApp instance."""
-        socket = f"{self.url}/ws/{self.symbol.lower()}@kline_{self.interval}"
-        print(f'\033[92mTRADES\033[0m-> socket: {socket}')
-
-        return WebSocketApp(
-            socket,
-            on_open=self.on_open,
-            on_close=self.on_close,
-            on_message=self.on_message,
-            on_error=self.on_error,
-        )
-
     def get_log_prefix(self) -> str:
         return "KLINES"
 
@@ -50,5 +37,6 @@ def ws_kline(url: str, symbol: str, interval: str) -> WebSocketApp:
     return BinanceKlineWebSocket(url, symbol, interval).create_websocket()
 
 if __name__ == "__main__":
-    binance_kline_ws = BinanceKlineWebSocket(API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL)
+    URL = f"{API_WEBSOCKET_URL}/ws/{TRADE_SYMBOL.lower()}@kline_{KLINE_INTERVAL}"
+    binance_kline_ws = BinanceKlineWebSocket(URL, TRADE_SYMBOL, KLINE_INTERVAL)
     binance_kline_ws.run()

@@ -5,6 +5,7 @@ import ssl
 import time
 from datetime import datetime
 import websocket
+from websocket import WebSocketApp
 
 
 class BinanceWebSocketBase:
@@ -47,6 +48,18 @@ class BinanceWebSocketBase:
         self.ws = self.create_websocket()
         self.ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
+    def create_websocket(self) -> websocket.WebSocketApp:
+        """Creates a WebSocketApp instance."""
+        print(f'\033[92mTRADES\033[0m-> socket: {self.url}')
+
+        return WebSocketApp(
+            url=self.url,
+            on_open=self.on_open,
+            on_close=self.on_close,
+            on_message=self.on_message,
+            on_error=self.on_error,
+        )
+
     def on_message(self, _ws, message) -> None:
         """Handles incoming WebSocket messages (to be implemented in subclasses)."""
         raise NotImplementedError
@@ -57,8 +70,4 @@ class BinanceWebSocketBase:
 
     def get_log_prefix(self) -> str:
         """Returns log prefix (to be implemented in subclasses)."""
-        raise NotImplementedError
-
-    def create_websocket(self) -> websocket.WebSocketApp:
-        """Creates a WebSocketApp instance."""
         raise NotImplementedError

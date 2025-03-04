@@ -1,8 +1,6 @@
 """
 Binance Kline WebSocket API.
 """
-import json
-
 from websocket import WebSocketApp
 
 from api_websocket import handle_websocket_message
@@ -21,12 +19,7 @@ class BinanceKlineWebSocket(BinanceWebSocketBase):
         handle_websocket_message(message)
 
     def subscribe(self):
-        payload = {
-            "method": "SUBSCRIBE",
-            "params": [f"{self.symbol}@kline_{self.interval}"],
-            "id": 1
-        }
-        self.ws.send(json.dumps(payload))
+        pass
 
     def get_log_prefix(self) -> str:
         return "KLINES"

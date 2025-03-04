@@ -36,6 +36,7 @@ def ws_kline(url: str, symbol: str, interval: str) -> WebSocketApp:
     """Function to start BinanceKlineWebSocket."""
     return BinanceKlineWebSocket(url, symbol, interval).create_websocket()
 
+
 if __name__ == "__main__":
     URL = f"{API_WEBSOCKET_URL}/ws/{TRADE_SYMBOL.lower()}@kline_{KLINE_INTERVAL}"
     binance_kline_ws = BinanceKlineWebSocket(URL, TRADE_SYMBOL, KLINE_INTERVAL)

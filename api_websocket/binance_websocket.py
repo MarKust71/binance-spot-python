@@ -1,8 +1,6 @@
 """
 Binance Kline WebSocket API.
 """
-from websocket import WebSocketApp
-
 from api_websocket import handle_websocket_message
 from api_websocket.binance_websocket_base import BinanceWebSocketBase
 from constants import API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL
@@ -25,12 +23,13 @@ class BinanceKlineWebSocket(BinanceWebSocketBase):
         return "KLINES"
 
 
-def ws_kline(url: str, symbol: str, interval: str) -> WebSocketApp:
+def ws_kline(url: str, symbol: str, interval: str) -> None:
     """Function to start BinanceKlineWebSocket."""
-    return BinanceKlineWebSocket(url, symbol, interval).create_websocket()
+    kline_ws = BinanceKlineWebSocket(url, symbol, interval)
+    kline_ws.start()
 
 
 if __name__ == "__main__":
     URL = f"{API_WEBSOCKET_URL}/ws/{TRADE_SYMBOL.lower()}@kline_{KLINE_INTERVAL}"
     binance_kline_ws = BinanceKlineWebSocket(URL, TRADE_SYMBOL, KLINE_INTERVAL)
-    binance_kline_ws.run()
+    binance_kline_ws.start()

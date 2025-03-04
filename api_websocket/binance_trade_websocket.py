@@ -23,7 +23,8 @@ class BinanceTradeWebSocket(BinanceWebSocketBase):
             }
             self.ws.send(json.dumps(payload))
         else:
-            print("\033[91mTRADES\033[0m-> WebSocket not initialized, cannot send subscription request.")
+            print("\033[91mTRADES\033[0m-> WebSocket not initialized, "
+                  "cannot send subscription request.")
 
     def get_log_prefix(self) -> str:
         return "TRADES"

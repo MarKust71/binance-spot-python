@@ -4,6 +4,7 @@ Binance websocket module.
 """
 
 import ssl
+import json
 import websocket
 
 from websocket import WebSocketApp
@@ -13,11 +14,11 @@ from constants import API_WEBSOCKET_URL, TRADE_SYMBOL, KLINE_INTERVAL
 
 def on_error(_ws, error) -> None:
     """
-    This function does something.
+    Handle WebSocket errors.
 
     Args:
-        _ws: Description of param1.
-        error: Description of param2.
+        _ws: WebSocket instance.
+        error: Error message.
 
     Returns:
         None
@@ -27,10 +28,10 @@ def on_error(_ws, error) -> None:
 
 def on_open(_ws) -> None:
     """
-    This function does something.
+    Handle WebSocket opening.
 
     Args:
-        _ws: Description of param1.
+        ws: WebSocket instance.
 
     Returns:
         None
@@ -40,12 +41,12 @@ def on_open(_ws) -> None:
 
 def on_close(_ws, status_code, close_msg) -> None:
     """
-    This function does something.
+    Handle WebSocket closure.
 
     Args:
-        _ws: Description of param1.
-        status_code: Description of param1.
-        close_msg: Description of param1.
+        _ws: WebSocket instance.
+        status_code: Status code of closure.
+        close_msg: Message associated with closure.
 
     Returns:
         None
@@ -53,31 +54,43 @@ def on_close(_ws, status_code, close_msg) -> None:
     print(f'KLINES-> connection closed: status code: {status_code}, message: {close_msg}')
 
 
-def on_message(_ws, message) -> None:
+def on_message(ws, message) -> None:
     """
-    This function does something.
+    Handle WebSocket messages.
 
     Args:
-        _ws: Description of param1.
-        message: Description of param1.
+        ws: WebSocket instance.
+        message: Message received.
 
     Returns:
         None.
     """
-    handle_websocket_message(message)
+    try:
+        data = json.loads(message)
+
+        # Check if it's a ping message
+        if "ping" in data:
+            print("\033[93mKLINES\033[0m-> received ping, sending pong")
+            ws.send(json.dumps({"pong": data["ping"]}))  # Send a pong response
+            return
+
+        handle_websocket_message(message)
+
+    except json.JSONDecodeError:
+        print("KLINES-> Received non-JSON message:", message)
 
 
 def ws_kline(url: str, symbol: str, interval: str) -> WebSocketApp:
     """
-    This function does something.
+    Create a WebSocket connection to Binance for kline data.
 
     Args:
-        url: Description of param1.
-        symbol: Description of param1.
-        interval: Description of param1.
+        url: Binance WebSocket API URL.
+        symbol: Trading pair symbol.
+        interval: Kline interval.
 
     Returns:
-        None.
+        WebSocketApp instance.
     """
     socket = f"{url}/ws/{symbol.lower()}@kline_{interval}"
     print(f'KLINES-> socket: {socket}')

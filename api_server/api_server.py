@@ -3,15 +3,16 @@ This module initializes the FastAPI application and defines the API endpoints
 for interacting with the trades database. It includes functionality for
 pagination and sorting of trade data.
 """
+import asyncio
 
-
-from fastapi import FastAPI, Depends, Query
+from fastapi import FastAPI, Depends, Query, WebSocket, WebSocketDisconnect
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 
 from db.database import DATABASE_URL
 from db.models import Trade
 
+# Konfiguracja bazy danych
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -32,6 +33,42 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+# Lista połączeń WebSocket
+active_connections = set()
+
+# Endpoint dla WebSocket
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """
+    WebSocket endpoint that accepts incoming connections and broadcasts messages
+    :param websocket:
+    :return:
+    """
+    await websocket.accept()
+    print(websocket)
+    active_connections.add(websocket)
+    print(f"Active connections: {active_connections}")
+    try:
+        while True:
+            message = await websocket.receive_text()  # Oczekujemy na dane, ale nie przetwarzamy ich
+            print(f"Received message: {message}")
+    except WebSocketDisconnect:
+        active_connections.remove(websocket)
+
+async def send_websocket_message(message: str):
+    """
+    Sends a message to all active WebSocket connections
+    :param message:
+    :return:
+    """
+    if active_connections:
+        print(f"Sending websocket message: {message}")
+        await asyncio.gather(*(ws.send_text(message) for ws in active_connections))
+    else:
+        print("No active connections")
+
 
 # Endpoint zwracający dane z tabeli z mechanizmem stronicowania
 @app.get("/api/trades/", response_model=dict)

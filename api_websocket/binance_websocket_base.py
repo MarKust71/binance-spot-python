@@ -32,13 +32,15 @@ class BinanceWebSocketBase:
     def on_close(self, _ws, status_code, close_msg) -> None:
         """Handles WebSocket closure and attempts reconnection."""
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        last_open_time = datetime.fromtimestamp(self.last_open_time).strftime('%Y-%m-%d %H:%M:%S')
         print(f'\033[91m{self.get_log_prefix()}\033[0m-> connection closed at {timestamp}: '
-              f'status {status_code}, message {close_msg}')
+              f'status {status_code}, message {close_msg} '
+              f'| last open time {last_open_time} '
+              f'=> +{round(time.time() - self.last_open_time, 1)}s')
 
         if self.last_open_time and (time.time() - self.last_open_time) >= 5:
             print(f"\033[93m{self.get_log_prefix()}\033[0m-> "
-                  f"Reconnecting WebSocket in 3 seconds...")
-            time.sleep(3)
+                  f"Reconnecting WebSocket...")
             self.start()
 
     def create_websocket(self) -> WebSocketApp:
@@ -56,22 +58,19 @@ class BinanceWebSocketBase:
 
     def start(self):
         """Initializes and starts the WebSocket connection."""
-        while True:
-            try:
-                self.ws = self.create_websocket()
-                self.ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-            except websocket.WebSocketConnectionClosedException as e:
-                print(f'\033[91m{self.get_log_prefix()}\033[0m-> '
-                      f'connection closed, retrying in 3 seconds... {e}')
-                time.sleep(3)
-            except websocket.WebSocketException as e:
-                print(f'\033[91m{self.get_log_prefix()}\033[0m-> '
-                      f'WebSocket error, retrying in 3 seconds... {e}')
-                time.sleep(3)
-            except OSError as e:
-                print(f'\033[91m{self.get_log_prefix()}\033[0m-> '
-                      f'Network error, retrying in 3 seconds... {e}')
-                time.sleep(3)
+        self.last_open_time = time.time()
+        try:
+            self.ws = self.create_websocket()
+            self.ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+        except websocket.WebSocketConnectionClosedException as e:
+            print(f'\033[91m{self.get_log_prefix()}\033[0m-> '
+                  f'connection closed, {e}')
+        except websocket.WebSocketException as e:
+            print(f'\033[91m{self.get_log_prefix()}\033[0m-> '
+                  f'WebSocket error, {e}')
+        except OSError as e:
+            print(f'\033[91m{self.get_log_prefix()}\033[0m-> '
+                  f'Network error, {e}')
 
     def on_message(self, _ws, message) -> None:
         """Handles incoming WebSocket messages (to be implemented in subclasses)."""

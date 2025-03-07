@@ -1,11 +1,12 @@
 """
 This module updates trades in the database based on the given symbol, price, and timestamp.
 """
-
 import pandas as pd
+import websocket
 
 from constants import Reason, TradeStatus
 from db.repositories import TradeRepository
+from db.utils.serialize_data import serialize_data
 
 from .determine_trade_outcome import determine_trade_outcome
 from .print_trade_update import print_trade_update
@@ -40,6 +41,11 @@ def db_update_trades(symbol: str, price: float, timestamp: pd.Timestamp) -> None
             'reason': reason
         }
         print_trade_update(trade_update)
+
+        # Wysyłanie komunikatu WebSocket
+        ws = websocket.create_connection("ws://127.0.0.1:8000/ws")
+        ws.send(serialize_data(trade_update))
+        ws.close()
 
         trades_repo.update_trade(
             trade.id,

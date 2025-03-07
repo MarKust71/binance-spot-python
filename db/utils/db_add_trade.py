@@ -2,13 +2,13 @@
 """
 Adds trade into database if conditions met.
 """
-
-
 import pandas as pd
 import numpy as np
+import websocket
 
 from constants import TradeSignal, TRADE_VALUE, TRADE_SYMBOL, Side
 from db.repositories import TradeRepository, TradeData
+from db.utils.serialize_data import serialize_data
 from helpers import set_fractals, determine_trend, get_trade_signal
 
 
@@ -27,8 +27,6 @@ def db_add_trade(
         delay: Delay.
         fractals_periods: Fractals periods.
     """
-
-
     trend_data = trend_candles[
         trend_candles['timestamp']
         <= candles['timestamp'].iloc[-1] - pd.Timedelta(minutes=delay * fractals_periods)
@@ -50,16 +48,32 @@ def db_add_trade(
         print(f'QTY: {quantity}')
 
         trades_repo = TradeRepository()
+        trade_data_row = {
+            'date_time': candles['timestamp'].iloc[-1],
+            'symbol': TRADE_SYMBOL,
+            'side': Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
+            'price': candles["close"].to_numpy()[-1],
+            'quantity': quantity,
+            'atr': np.round(trend_data["atr"].to_numpy()[-1], 2)
+        }
         trade_data = TradeData(
-            date_time=candles['timestamp'].iloc[-1],
-            symbol=TRADE_SYMBOL,
-            side=Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
-            price=candles["close"].to_numpy()[-1],
-            quantity=quantity,
-            atr=np.round(trend_data["atr"].to_numpy()[-1], 2)
+            date_time=trade_data_row['date_time'],
+            symbol=trade_data_row['symbol'],
+            side=trade_data_row['side'],
+            price=trade_data_row['price'],
+            quantity=trade_data_row['quantity'],
+            atr=trade_data_row['atr']
         )
         new_trade_id = trades_repo.add_trade(trade_data)
         trades_repo.close()
+
+        # Wysyłanie komunikatu WebSocket
+        try:
+            ws = websocket.create_connection("ws://127.0.0.1:8000/ws")
+            ws.send(serialize_data(trade_data_row))
+            ws.close()
+        except ConnectionRefusedError:
+            print('New trade: WebSocket server is not running')
 
         if trade_signal == TradeSignal.SELL:
             print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')

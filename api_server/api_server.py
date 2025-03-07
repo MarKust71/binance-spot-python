@@ -54,6 +54,8 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             message = await websocket.receive_text()  # Oczekujemy na dane, ale nie przetwarzamy ich
             print(f"Received message: {message}")
+            if message == "ping":
+                await send_websocket_message("pong")
     except WebSocketDisconnect:
         active_connections.remove(websocket)
 

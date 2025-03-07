@@ -43,9 +43,12 @@ def db_update_trades(symbol: str, price: float, timestamp: pd.Timestamp) -> None
         print_trade_update(trade_update)
 
         # Wysyłanie komunikatu WebSocket
-        ws = websocket.create_connection("ws://127.0.0.1:8000/ws")
-        ws.send(serialize_data(trade_update))
-        ws.close()
+        try:
+            ws = websocket.create_connection("ws://127.0.0.1:8000/ws")
+            ws.send(serialize_data(trade_update))
+            ws.close()
+        except ConnectionRefusedError:
+            print('Update trade: WebSocket server is not running')
 
         trades_repo.update_trade(
             trade.id,

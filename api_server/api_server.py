@@ -6,6 +6,7 @@ pagination and sorting of trade data.
 import asyncio
 
 from fastapi import FastAPI, Depends, Query, WebSocket, WebSocketDisconnect
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 
@@ -20,6 +21,7 @@ Base = declarative_base()
 
 # Inicjalizacja FastAPI
 app = FastAPI()
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 
 # Funkcja zależności do pobierania sesji
 def get_db():
@@ -56,6 +58,8 @@ async def websocket_endpoint(websocket: WebSocket):
             print(f"Received message: {message}")
             if message == "ping":
                 await send_websocket_message("pong")
+            else:
+                await send_websocket_message(message)
     except WebSocketDisconnect:
         active_connections.remove(websocket)
 

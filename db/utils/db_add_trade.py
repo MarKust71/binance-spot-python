@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import websocket
 
-from constants import TradeSignal, TRADE_VALUE, TRADE_SYMBOL, Side
+from constants import TradeSignal, TRADE_VALUE, TRADE_SYMBOL, Side, Reason
 from db.repositories import TradeRepository, TradeData
 from db.utils.serialize_data import serialize_data
 from helpers import set_fractals, determine_trend, get_trade_signal
@@ -54,7 +54,8 @@ def db_add_trade(
             'side': Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
             'price': candles["close"].to_numpy()[-1],
             'quantity': quantity,
-            'atr': np.round(trend_data["atr"].to_numpy()[-1], 2)
+            'atr': np.round(trend_data["atr"].to_numpy()[-1], 2),
+            'reason': Reason.NONE,
         }
         trade_data = TradeData(
             date_time=trade_data_row['date_time'],

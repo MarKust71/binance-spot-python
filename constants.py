@@ -63,6 +63,7 @@ class Reason(enum.Enum):
     STOP_LOSS = "STOP LOSS"
     TAKE_PROFIT = "TAKE PROFIT"
     TAKE_PROFIT_PARTIAL = "TAKE PROFIT PARTIAL"
+    TAKE_PROFIT_SAFE = "TAKE PROFIT SAFE"
     NONE = "NONE"
 
 # Trade status
@@ -72,6 +73,6 @@ class TradeStatus(enum.Enum):
     """
     OPEN = "open"
     PARTIAL = "partial"
-    TAKE_PROFIT = "take_profit"
     CLOSED = "closed"
+    SAFE = "safe"
     NONE = "none"

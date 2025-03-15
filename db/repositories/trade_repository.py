@@ -1,10 +1,10 @@
 """
 This module contains the TradeRepository class for managing trade operations in the database.
 """
-
-
 from dataclasses import dataclass
 from datetime import datetime
+
+import pandas as pd
 
 from sqlalchemy import case
 from sqlalchemy.exc import SQLAlchemyError
@@ -132,6 +132,30 @@ class TradeRepository:
         Pobiera wszystkie transakcje dla danego ID.
         """
         return self.session.query(Trade).filter(Trade.id == trade_id).first()
+
+
+    def get_trades_by_symbol_older_than_timestamp(
+            self,
+            is_closed: bool,
+            symbol: str,
+            time_from: pd.Timestamp
+    ):
+        """
+        Zwraca wszystkie rekordy spełniające warunki:
+        - symbol zgodny z parametrem 'symbol',
+        - data i czas rekordu większy lub równy parametrowi 'timestamp',
+        - wartość is_closed różna od parametru 'is_closed'.
+
+        :param is_closed: bool - oczekiwana wartość pola is_closed (najczęściej False)
+        :param symbol: str - symbol, dla którego filtrowane są rekordy
+        :param time_from: datetime - data i czas, od którego filtrowane są rekordy
+        :return: lista rekordów spełniających powyższe warunki
+        """
+        return self.session.query(Trade).filter(
+            Trade.symbol == symbol,
+            Trade.date_time < time_from,
+            Trade.is_closed == is_closed
+        ).all()
 
 
     def delete_trade(self, trade_id: int):

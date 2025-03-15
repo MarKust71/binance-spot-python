@@ -23,10 +23,11 @@ def db_update_trades(symbol: str, price: float, timestamp: pd.Timestamp) -> None
     """
     trades_repo = TradeRepository()
 
-    for trade in [t for t in trades_repo.get_all_trades() if not t.is_closed]:
-        if trade.date_time >= timestamp or trade.symbol != symbol:
-            continue
-
+    for trade in trades_repo.get_trades_by_symbol_older_than_timestamp(
+        symbol=symbol,
+        time_from=timestamp,
+        is_closed=False
+    ):
         reason, quantity, profit = determine_trade_outcome(trade, price)
 
         if reason == Reason.NONE:

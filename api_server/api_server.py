@@ -57,13 +57,13 @@ async def websocket_endpoint(websocket: WebSocket):
             message = await websocket.receive_text()  # Oczekujemy na dane, ale nie przetwarzamy ich
             print(f"Received message: {message}")
             if message == "ping":
-                await send_websocket_message("pong")
+                await send_message("pong")
             else:
-                await send_websocket_message(message)
+                await send_message(message)
     except WebSocketDisconnect:
         active_connections.remove(websocket)
 
-async def send_websocket_message(message: str):
+async def send_message(message: str):
     """
     Sends a message to all active WebSocket connections
     :param message:
@@ -113,10 +113,14 @@ def read_items(
             "atr": trade.atr,
             "stop_loss": trade.stop_loss,
             "take_profit_partial": trade.take_profit_partial,
+            "take_profit_safe": trade.take_profit_safe,
+            "take_profit": trade.take_profit,
             "take_profit_partial_price": trade.take_profit_partial_price,
             "take_profit_partial_quantity": trade.take_profit_partial_quantity,
             "take_profit_partial_date_time": trade.take_profit_partial_date_time,
-            "take_profit": trade.take_profit,
+            "take_profit_safe_price": trade.take_profit_safe_price,
+            "take_profit_safe_quantity": trade.take_profit_safe_quantity,
+            "take_profit_safe_date_time": trade.take_profit_safe_date_time,
             "close_price": trade.close_price,
             "profit": trade.profit,
             "is_closed": trade.is_closed,

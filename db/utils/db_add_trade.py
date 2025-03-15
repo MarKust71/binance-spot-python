@@ -4,12 +4,11 @@ Adds trade into database if conditions met.
 """
 import pandas as pd
 import numpy as np
-import websocket
 
 from constants import TradeSignal, TRADE_VALUE, TRADE_SYMBOL, Side, Reason
 from db.repositories import TradeRepository, TradeData
-from db.utils.serialize_data import serialize_data
 from helpers import set_fractals, determine_trend, get_trade_signal
+from utils.send_websocket_message import send_websocket_message
 
 
 def db_add_trade(
@@ -69,12 +68,10 @@ def db_add_trade(
         trades_repo.close()
 
         # Wysyłanie komunikatu WebSocket
-        try:
-            ws = websocket.create_connection("ws://127.0.0.1:8000/ws")
-            ws.send(serialize_data(trade_data_row))
-            ws.close()
-        except ConnectionRefusedError:
-            print('New trade: WebSocket server is not running')
+        send_websocket_message(
+            message_data=trade_data_row,
+            error_message="New trade: WebSocket server is not running"
+        )
 
         if trade_signal == TradeSignal.SELL:
             print('***** SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL SELL *****')

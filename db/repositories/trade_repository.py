@@ -64,6 +64,12 @@ class TradeRepository:
                 else trade_data.price - TP_SL,
                 2
             ),
+            'take_profit_safe': round(
+                trade_data.price + TP_SL * 2
+                if trade_data.side == Side.BUY
+                else trade_data.price - TP_SL * 2,
+                2
+            ),
             'take_profit': round(
                 trade_data.price + TP_SL * TP_SL_FACTOR
                 if trade_data.side == Side.BUY
@@ -176,11 +182,37 @@ class TradeRepository:
         self.session.commit()
 
 
+    def repair_take_profit_safe(self):
+        """
+        Naprawia wartość pola take_profit_safe
+        """
+        try:
+            self.session.query(Trade).update(
+                {
+                    Trade.take_profit_safe: case(
+                        (Trade.side == Side.BUY, Trade.price + TP_SL * 2),
+                        (Trade.side == Side.SELL, Trade.price - TP_SL * 2),
+                        else_=Trade.take_profit_safe
+                    )
+                },
+                synchronize_session=False
+            )
+            self.session.commit()
+        except SQLAlchemyError as e:
+            print(f"Błąd podczas naprawy pola take_profit_safe: {e}")
+            self.session.rollback()
+
+
     def repair_trade_status(self):
         """
         Aktualizuje status transakcji w bazie danych na podstawie warunków:
         - 'CLOSED', jeśli is_closed == 1
-        - 'PARTIAL', jeśli is_closed == 0 i take_profit_datetime nie jest puste
+        - 'SAFE', jeśli is_closed == 0
+            i take_profit_safe_date_time NIE JEST puste
+            i take_profit_partial_date_time NIE JEST puste
+        - 'PARTIAL', jeśli is_closed == 0
+            i take_profit_partial_date_time NIE JEST puste
+            i take_profit_safe_date_time JEST puste
         - 'OPEN' w pozostałych przypadkach
         """
         try:
@@ -188,10 +220,18 @@ class TradeRepository:
                 {
                     Trade.status: case(
                 (Trade.is_closed == 1, TradeStatus.CLOSED),
-                        ((Trade.is_closed == 0)
-                         & (
-                             Trade.take_profit_partial_date_time.isnot(None)
-                         ), TradeStatus.PARTIAL),
+                        (
+                            (Trade.is_closed == 0)
+                            & (Trade.take_profit_partial_date_time.isnot(None))
+                            & (Trade.take_profit_safe_date_time.isnot(None)),
+                            TradeStatus.SAFE
+                        ),
+                        (
+                            (Trade.is_closed == 0)
+                            & (Trade.take_profit_partial_date_time.isnot(None))
+                            & (Trade.take_profit_safe_date_time.is_(None)),
+                            TradeStatus.PARTIAL
+                        ),
                         else_=TradeStatus.OPEN
                     )
                 },

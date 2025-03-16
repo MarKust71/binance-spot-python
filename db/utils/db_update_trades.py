@@ -27,7 +27,7 @@ def db_update_trades(symbol: str, price: float, timestamp: pd.Timestamp) -> None
         time_from=timestamp,
         is_closed=False
     ):
-        reason, quantity, profit = determine_trade_outcome(trade, price)
+        reason, quantity, profit, stop_loss_new = determine_trade_outcome(trade, price)
 
         if reason == Reason.NONE:
             continue
@@ -38,7 +38,8 @@ def db_update_trades(symbol: str, price: float, timestamp: pd.Timestamp) -> None
             'price': price,
             'quantity': quantity,
             'profit': profit,
-            'reason': reason
+            'reason': reason,
+            'stop_loss': stop_loss_new
         }
         print_trade_update(trade_update)
 
@@ -52,20 +53,35 @@ def db_update_trades(symbol: str, price: float, timestamp: pd.Timestamp) -> None
             trade.id,
             is_closed=reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT},
             status=TradeStatus.CLOSED if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT}
-            else TradeStatus.PARTIAL if reason == Reason.TAKE_PROFIT_PARTIAL
-            else trade.status,
+                else TradeStatus.SAFE if reason == Reason.TAKE_PROFIT_SAFE
+                else TradeStatus.PARTIAL if reason == Reason.TAKE_PROFIT_PARTIAL
+                else trade.status,
+
             close_price=price if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT}
-            else trade.close_price,
+                else trade.close_price,
             close_date_time=timestamp if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT}
-            else trade.close_date_time,
+                else trade.close_date_time,
+
+            take_profit_safe_price=price if reason == Reason.TAKE_PROFIT_SAFE
+                else trade.take_profit_safe_price,
+            take_profit_safe_quantity=quantity if reason == Reason.TAKE_PROFIT_SAFE
+                else trade.take_profit_safe_quantity,
+            take_profit_safe_date_time=timestamp if reason == Reason.TAKE_PROFIT_SAFE
+                else trade.take_profit_safe_date_time,
+
+            stop_loss=stop_loss_new if reason == Reason.UPDATE_STOP_LOSS
+                else trade.stop_loss,
+
             take_profit_partial_price=price if reason == Reason.TAKE_PROFIT_PARTIAL
-            else trade.take_profit_partial_price,
+                else trade.take_profit_partial_price,
             take_profit_partial_quantity=quantity if reason == Reason.TAKE_PROFIT_PARTIAL
-            else trade.take_profit_partial_quantity,
+                else trade.take_profit_partial_quantity,
             take_profit_partial_date_time=timestamp if reason == Reason.TAKE_PROFIT_PARTIAL
-            else trade.take_profit_partial_date_time,
+                else trade.take_profit_partial_date_time,
+
             rest_quantity=0 if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT}
-            else round(trade.rest_quantity - quantity, 4),
+                else round(trade.rest_quantity - quantity, 4),
+
             profit=round(profit + (trade.profit or 0), 2),
         )
 

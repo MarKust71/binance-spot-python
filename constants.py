@@ -8,6 +8,7 @@ from binance import KLINE_INTERVAL_1MINUTE, KLINE_INTERVAL_5MINUTE
 from decouple import config
 
 API_WEBSOCKET_URL = config('API_WEBSOCKET_URL')
+FORCE_TAKE_PROFIT = bool(config('FORCE_TAKE_PROFIT') == 'True')
 
 RSI_PERIOD = 14
 RSI_OVERBOUGHT = 70
@@ -64,6 +65,7 @@ class Reason(enum.Enum):
     TAKE_PROFIT = "TAKE PROFIT"
     TAKE_PROFIT_PARTIAL = "TAKE PROFIT PARTIAL"
     TAKE_PROFIT_SAFE = "TAKE PROFIT SAFE"
+    UPDATE_STOP_LOSS = "UPDATE STOP LOSS"
     NONE = "NONE"
 
 # Trade status

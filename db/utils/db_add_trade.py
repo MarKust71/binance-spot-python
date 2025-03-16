@@ -43,7 +43,7 @@ def db_add_trade(
     if trade_signal != TradeSignal.NONE:
         quantity=round(TRADE_VALUE / candles["close"].to_numpy()[-1], 4)
 
-        print(f'ATR: {trend_data["atr"].iloc[-1]:,.2f}')
+        print(f'ATR: {candles["atr"].iloc[-1]:,.2f}')
         print(f'QTY: {quantity}')
 
         trades_repo = TradeRepository()
@@ -53,7 +53,7 @@ def db_add_trade(
             'side': Side.SELL if trade_signal == TradeSignal.SELL else Side.BUY,
             'price': candles["close"].to_numpy()[-1],
             'quantity': quantity,
-            'atr': np.round(trend_data["atr"].to_numpy()[-1], 2),
+            'atr': np.round(candles["atr"].to_numpy()[-1], 2),
             'reason': Reason.NONE,
         }
         trade_data = TradeData(

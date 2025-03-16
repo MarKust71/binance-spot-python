@@ -13,6 +13,7 @@ def print_trade_update(trade_update):
     quantity = trade_update['quantity']
     profit = trade_update['profit']
     reason = trade_update['reason']
+    stop_loss = trade_update['stop_loss']
 
     color = "\033[92m" if profit > 0 else "\033[91m" if profit < 0 else ""
     reset_color = "\033[0m" if color else ""
@@ -21,7 +22,7 @@ def print_trade_update(trade_update):
         f'ID: {trade.id} date: {timestamp} price: {price} '
         f'quantity: {trade.rest_quantity \
             if reason in {Reason.STOP_LOSS, Reason.TAKE_PROFIT} else quantity} '
-        f'profit: {profit} {color}***** {reason.value} *****{reset_color}'
+        f'profit: {profit} S/L: {stop_loss} {color}***** {reason.value} *****{reset_color}'
     )
 
 

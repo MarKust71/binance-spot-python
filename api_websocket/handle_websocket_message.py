@@ -2,11 +2,10 @@
 """
 Binance handle websocket message module.
 """
-
-
 import json
 import pandas as pd
 
+from api_websocket.log_candle_close import log_candle_close
 from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL
 from db.utils import db_add_trade
 from helpers import fetch_candles, get_rsi_signals
@@ -31,8 +30,7 @@ def handle_websocket_message(message) -> None:
         handle_websocket_message.LAST_CLOSE = None
 
     json_message = json.loads(message)
-    event_time = pd.to_datetime(json_message['E'], unit='ms')
-    # kline = json_message['k']
+    event_time_utc = pd.to_datetime(json_message['E'], unit='ms', utc=True)
 
     candles = fetch_candles(
         symbol=TRADE_SYMBOL, interval=KLINE_INTERVAL, limit=LIMIT, end_time=None
@@ -41,28 +39,23 @@ def handle_websocket_message(message) -> None:
         symbol=TRADE_SYMBOL, interval=KLINE_TREND_INTERVAL, limit=TREND_LIMIT, end_time=None
     )
 
-    close_time = pd.to_datetime(candles['close_time'].to_numpy()[-1], unit='ms')
-    is_candle_closed = close_time < event_time
+    close_time_utc = pd.to_datetime(candles['close_time'].to_numpy()[-1], unit='ms', utc=True)
+    is_candle_closed = close_time_utc < event_time_utc
 
-    if is_candle_closed and handle_websocket_message.LAST_CLOSE != close_time:
-        handle_websocket_message.LAST_CLOSE = close_time
-        close_price = candles['close'].to_numpy()[-1]
-        open_price = candles['open'].to_numpy()[-1]
-        rsi = candles['rsi'].to_numpy()[-1]
-        atr = candles['atr'].to_numpy()[-1]
+    if is_candle_closed and handle_websocket_message.LAST_CLOSE != close_time_utc:
+        handle_websocket_message.LAST_CLOSE = close_time_utc
+
+        candle_data = {
+            "close_price": candles['close'].to_numpy()[-1],
+            "open_price": candles['open'].to_numpy()[-1],
+            "rsi": candles['rsi'].to_numpy()[-1],
+            "atr": candles['atr'].to_numpy()[-1],
+            "close_time_utc": close_time_utc,
+        }
+
         rsi_signals = get_rsi_signals(candles['rsi'].to_numpy())
 
-        color = "\033[92m" if close_price > open_price else "\033[91m" \
-            if close_price < open_price else ""
-        reset_color = "\033[0m" if color else ""
-        print(
-            f'Candle closed: {close_time} '
-            f'| price: {color}{close_price:,.2f}{reset_color} '
-            f'| RSI: {rsi:.2f} '
-            f'| ATR: {atr:.2f} '
-            f'{">>>" if rsi_signals["swing_high"] and rsi_signals["signal"] else ""}'
-            f'{"<<<" if rsi_signals["swing_low"] and rsi_signals["signal"] else ""}'
-        )
+        log_candle_close(candle_data, rsi_signals)
 
         new_trade_id = db_add_trade(
             candles=candles,

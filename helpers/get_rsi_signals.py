@@ -2,6 +2,7 @@
 """
 Calculate RSI signals module.
 """
+from constants import RSI_OVERBOUGHT, RSI_OVERSOLD
 
 
 def get_rsi_signals(rsi: list) -> dict:
@@ -17,8 +18,8 @@ def get_rsi_signals(rsi: list) -> dict:
     rsi_signals = {
         "swing_high": rsi[-2] > rsi[-1] and rsi[-2] > rsi[-3],
         "swing_low": rsi[-2] < rsi[-1] and rsi[-2] < rsi[-3],
-        "signal_high": rsi[-2] > 70,
-        "signal_low": rsi[-2] < 30
+        "signal_high": rsi[-2] > RSI_OVERBOUGHT,
+        "signal_low": rsi[-2] < RSI_OVERSOLD
     }
 
     rsi_signals["swing"] = rsi_signals["swing_high"] or rsi_signals["swing_low"]

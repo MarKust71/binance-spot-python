@@ -2,8 +2,6 @@
 """
 Binance handle trade websocket message module.
 """
-
-
 import json
 import pandas as pd
 

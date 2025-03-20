@@ -3,10 +3,14 @@
 Binance handle trade websocket message module.
 """
 import json
+import itertools
 import pandas as pd
 
 from db.utils import db_update_trades
 
+# spinner = itertools.cycle(["|", "/", "-", "\\"])
+spinner = itertools.cycle(["◑", "◒", "◐", "◓"])
+# spinner = itertools.cycle([".", "o", "O", "0", "O", "o"])
 
 def handle_trade_websocket_message(message) -> None:
     """
@@ -22,6 +26,8 @@ def handle_trade_websocket_message(message) -> None:
     event_time = pd.to_datetime(json_message['E'], unit='ms')
     event_price = pd.to_numeric(json_message['p'])
     symbol = json_message['s']
+
+    print(f"\r{next(spinner)}", end="", flush=True)
 
     db_update_trades(
         symbol=symbol,

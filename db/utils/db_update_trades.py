@@ -21,12 +21,13 @@ def db_update_trades(symbol: str, price: float, timestamp: pd.Timestamp) -> None
         timestamp (pd.Timestamp): The timestamp of the trade.
     """
     trades_repo = TradeRepository()
-
-    for trade in trades_repo.get_trades_by_symbol_older_than_timestamp(
+    trades = trades_repo.get_trades_by_symbol_older_than_timestamp(
         symbol=symbol,
         time_from=timestamp,
         is_closed=False
-    ):
+    )
+
+    for trade in trades:
         reason, quantity, profit, stop_loss_new = determine_trade_outcome(trade, price)
 
         if reason == Reason.NONE:

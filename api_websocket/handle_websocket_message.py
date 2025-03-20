@@ -3,6 +3,7 @@
 Binance handle websocket message module.
 """
 import json
+import itertools
 import pandas as pd
 
 from api_websocket.log_candle_close import log_candle_close
@@ -15,6 +16,8 @@ TREND_LIMIT = 200
 DELAY = 0
 FRACTALS_PERIODS = 8
 
+spinner = itertools.cycle(["|", "/", "-", "\\"])
+
 
 def handle_websocket_message(message) -> None:
     """
@@ -26,6 +29,8 @@ def handle_websocket_message(message) -> None:
     Returns:
         None
     """
+    print(f"\r{next(spinner)}", end="", flush=True)
+
     if not hasattr(handle_websocket_message, 'LAST_CLOSE'):
         handle_websocket_message.LAST_CLOSE = None
 

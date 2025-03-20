@@ -25,7 +25,7 @@ def log_candle_close(candle_data, rsi_signals):
                                or candle_data["rsi"] < RSI_OVERSOLD) else ""
     reset_rsi_color = "\033[0m" if rsi_color else ""
     print(
-        f'Candle closed: {candle_data["close_time_utc"]
+        f'\rCandle closed: {candle_data["close_time_utc"]
             .tz_convert(pytz.timezone('Europe/Warsaw'))
             .round("min")
             .strftime('%Y-%m-%d %H:%M')} '

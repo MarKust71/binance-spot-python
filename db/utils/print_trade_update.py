@@ -22,7 +22,7 @@ def print_trade_update(trade_update):
     reset_color = "\033[0m" if color else ""
 
     print(
-        f'ID: {trade.id} '
+        f'\rID: {trade.id} '
         f'date: {pd.to_datetime(timestamp, unit='ms', utc=True)
             .tz_convert(local_tz).round("min").strftime('%Y-%m-%d %H:%M:%S')} '
         f'price: {price} '

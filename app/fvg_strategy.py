@@ -1,3 +1,6 @@
+"""
+Strategia FVG (Falling Volume Growth)
+"""
 import pandas as pd
 import numpy as np
 import mplfinance as mpf
@@ -9,6 +12,11 @@ class FVGStrategy:
     Strategia FVG (Falling Volume Growth)
     """
     def __init__(self, symbol='ETHUSDT', interval='1m', limit=200):
+        """
+        :param symbol:
+        :param interval:
+        :param limit:
+        """
         self.symbol = symbol
         self.interval = interval
         self.limit = limit
@@ -17,7 +25,12 @@ class FVGStrategy:
         self.fvg_zones = pd.DataFrame()
         self.backtest_results = []
 
+
     def get_data(self):
+        """
+        Pobiera dane z Binance API
+        :return:
+        """
         klines = self.client.get_klines(
             symbol=self.symbol,
             interval=self.interval,
@@ -33,7 +46,12 @@ class FVGStrategy:
         df = df[['open', 'high', 'low', 'close']].astype(float)
         self.df = df
 
+
     def detect_fvg(self):
+        """
+        Wykrywa strefy FVG
+        :return:
+        """
         df = self.df
         fvg_list = []
         for i in range(2, len(df)):
@@ -44,7 +62,7 @@ class FVGStrategy:
             low_c = df.iloc[i]['low']
             high_c = df.iloc[i]['low']
 
-            if high_a < low_c and  low_c < high_b and high_a > low_b:
+            if high_a < low_c and (low_c < high_b and high_a > low_b):
                 fvg_list.append({
                     'index': df.index[i],
                     'type': 'bullish',
@@ -53,7 +71,7 @@ class FVGStrategy:
                     'detected_at': df.index[i]
                 })
 
-            if high_c < low_a and low_b < high_c and high_b > low_a:
+            if high_c < low_a and (low_b < high_c and high_b > low_a):
                 fvg_list.append({
                     'index': df.index[i],
                     'type': 'bearish',
@@ -63,7 +81,12 @@ class FVGStrategy:
                 })
         self.fvg_zones = pd.DataFrame(fvg_list)
 
+
     def check_price_return(self):
+        """
+        Sprawdza czy cena wróciła do strefy FVG
+        :return:
+        """
         if self.fvg_zones.empty or self.df is None:
             return None
 
@@ -95,7 +118,14 @@ class FVGStrategy:
 
         return signals
 
+
     def backtest(self, take_profit=0.0003, stop_loss=0.0001):
+        """
+        Backtest strategii
+        :param take_profit:
+        :param stop_loss:
+        :return:
+        """
         df = self.df
         self.detect_fvg()
         trades = []
@@ -106,41 +136,76 @@ class FVGStrategy:
                 continue
 
             entry_price = df.iloc[entry_index]['close']
-            tp_price = entry_price * (1 + take_profit)
-            sl_price = entry_price * (1 - stop_loss)
 
-            for i in range(entry_index + 1, len(df)):
-                high = df.iloc[i]['high']
-                low = df.iloc[i]['low']
-
-                if high >= tp_price:
+            if fvg['type'] == 'bullish':
+                tp_price = entry_price * (1 + take_profit)
+                sl_price = entry_price * (1 - stop_loss)
+                for i in range(entry_index + 1, len(df)):
+                    high = df.iloc[i]['high']
+                    low = df.iloc[i]['low']
+                    if high >= tp_price:
+                        trades.append({
+                            'entry_time': df.index[entry_index],
+                            'exit_time': df.index[i],
+                            'result': 'TP',
+                            'entry_price': entry_price,
+                            'exit_price': tp_price})
+                        break
+                    if low <= sl_price:
+                        trades.append({
+                            'entry_time': df.index[entry_index],
+                            'exit_time': df.index[i],
+                            'result': 'SL',
+                            'entry_price': entry_price,
+                            'exit_price': sl_price})
+                        break
+                else:
                     trades.append({
                         'entry_time': df.index[entry_index],
-                        'exit_time': df.index[i],
-                        'result': 'TP',
+                        'exit_time': df.index[-1],
+                        'result': 'Open',
                         'entry_price': entry_price,
-                        'exit_price': tp_price})
-                    break
-                if low <= sl_price:
+                        'exit_price': df.iloc[-1]['close']})
+
+            elif fvg['type'] == 'bearish':
+                tp_price = entry_price * (1 - take_profit)
+                sl_price = entry_price * (1 + stop_loss)
+                for i in range(entry_index + 1, len(df)):
+                    high = df.iloc[i]['high']
+                    low = df.iloc[i]['low']
+                    if low <= tp_price:
+                        trades.append({
+                            'entry_time': df.index[entry_index],
+                            'exit_time': df.index[i],
+                            'result': 'TP',
+                            'entry_price': entry_price,
+                            'exit_price': tp_price})
+                        break
+                    if high >= sl_price:
+                        trades.append({
+                            'entry_time': df.index[entry_index],
+                            'exit_time': df.index[i],
+                            'result': 'SL',
+                            'entry_price': entry_price,
+                            'exit_price': sl_price})
+                        break
+                else:
                     trades.append({
                         'entry_time': df.index[entry_index],
-                        'exit_time': df.index[i],
-                        'result': 'SL',
+                        'exit_time': df.index[-1],
+                        'result': 'Open',
                         'entry_price': entry_price,
-                        'exit_price': sl_price})
-                    break
-            else:
-                trades.append({
-                    'entry_time': df.index[entry_index],
-                    'exit_time': df.index[-1],
-                    'result': 'Open',
-                    'entry_price': entry_price,
-                    'exit_price': df.iloc[-1]['close']})
+                        'exit_price': df.iloc[-1]['close']})
 
         self.backtest_results = trades
         return trades
 
+
     def summarize_backtest(self):
+        """
+        Podsumowanie wyników backtestu
+        :return:
+        """
         results = self.backtest_results
         if not results:
             print("Brak wyników do podsumowania.")
@@ -155,7 +220,12 @@ class FVGStrategy:
         print(f"Wyniki backtestu: TP={len(tp)}, SL={len(sl)}, "
               f"Otwarte={len(open_trades)}, Łączny PnL={pnl:.2f}")
 
+
     def plot_backtest(self):
+        """
+        Wizualizacja wyników backtestu
+        :return:
+        """
         if self.df is None or not self.backtest_results:
             print("Brak danych do wizualizacji.")
             return
@@ -179,18 +249,24 @@ class FVGStrategy:
         mpf.plot(df_plot, type='candle', style='charles', title=f"Backtest FVG - {self.symbol}",
                  ylabel='Cena', volume=False, addplot=apds)
 
+
     def run(self):
+        """
+        Uruchomienie strategii
+        :return:
+        """
         self.get_data()
         self.detect_fvg()
         signals = self.check_price_return()
         return signals
+
 
 if __name__ == "__main__":
     strategy = FVGStrategy(symbol='ETHUSDT', interval='1m')
     strategy.get_data()
     backtest = strategy.backtest()
     strategy.summarize_backtest()
-    strategy.plot_backtest()
+    # strategy.plot_backtest()
 
     if backtest:
         for backtest_trade in backtest:

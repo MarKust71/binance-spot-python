@@ -1,39 +1,23 @@
-"""
-Strategia FVG (Falling Volume Growth)
-"""
 import pandas as pd
-# from binance.client import Client
-import matplotlib.pyplot as plt
+import numpy as np
+import mplfinance as mpf
 
 from api import client
-
 
 class FVGStrategy:
     """
     Strategia FVG (Falling Volume Growth)
     """
     def __init__(self, symbol='ETHUSDT', interval='1m', limit=200):
-        """
-        Inicjalizacja strategii
-        :param symbol:
-        :param interval:
-        :param limit:
-        """
         self.symbol = symbol
         self.interval = interval
         self.limit = limit
-        # self.client = Client()
         self.client = client
         self.df = None
         self.fvg_zones = pd.DataFrame()
         self.backtest_results = []
 
-
     def get_data(self):
-        """
-        Pobranie danych z Binance
-        :return:
-        """
         klines = self.client.get_klines(
             symbol=self.symbol,
             interval=self.interval,
@@ -49,12 +33,7 @@ class FVGStrategy:
         df = df[['open', 'high', 'low', 'close']].astype(float)
         self.df = df
 
-
     def detect_fvg(self):
-        """
-        Wykrywanie strefy FVG
-        :return:
-        """
         df = self.df
         fvg_list = []
         for i in range(2, len(df)):
@@ -77,19 +56,14 @@ class FVGStrategy:
             if high_c < low_a and low_b < high_c and high_b > low_a:
                 fvg_list.append({
                     'index': df.index[i],
-                    'type': 'bullish',
+                    'type': 'bearish',
                     'from': high_a,
                     'to': low_c,
                     'detected_at': df.index[i]
                 })
         self.fvg_zones = pd.DataFrame(fvg_list)
 
-
     def check_price_return(self):
-        """
-        Sprawdzenie czy cena wróciła do strefy FVG
-        :return:
-        """
         if self.fvg_zones.empty or self.df is None:
             return None
 
@@ -121,14 +95,7 @@ class FVGStrategy:
 
         return signals
 
-
     def backtest(self, take_profit=0.0003, stop_loss=0.0001):
-        """
-        Backtest strategii
-        :param take_profit:
-        :param stop_loss:
-        :return:
-        """
         df = self.df
         self.detect_fvg()
         trades = []
@@ -173,12 +140,7 @@ class FVGStrategy:
         self.backtest_results = trades
         return trades
 
-
     def summarize_backtest(self):
-        """
-        Podsumowanie wyników backtestu
-        :return:
-        """
         results = self.backtest_results
         if not results:
             print("Brak wyników do podsumowania.")
@@ -193,48 +155,35 @@ class FVGStrategy:
         print(f"Wyniki backtestu: TP={len(tp)}, SL={len(sl)}, "
               f"Otwarte={len(open_trades)}, Łączny PnL={pnl:.2f}")
 
-
     def plot_backtest(self):
-        """
-        Wizualizacja wyników backtestu
-        :return:
-        """
         if self.df is None or not self.backtest_results:
             print("Brak danych do wizualizacji.")
             return
 
         df = self.df.copy()
-        plt.figure(figsize=(14,6))
-        plt.plot(df.index, df['close'], label='Close Price')
+        df.index.name = 'Date'
+        df_plot = df[['open', 'high', 'low', 'close']]
+
+        entry_series = pd.Series(np.nan, index=df_plot.index)
+        exit_series = pd.Series(np.nan, index=df_plot.index)
 
         for trade in self.backtest_results:
-            color = 'green' \
-                if trade['result'] == 'TP' \
-                else 'red' \
-                if trade['result'] == 'SL' \
-                else 'gray'
-            plt.scatter(trade['entry_time'], trade['entry_price'], color=color, marker='^')
-            plt.scatter(trade['exit_time'], trade['exit_price'], color=color, marker='v')
+            entry_series.at[trade['entry_time']] = trade['entry_price']
+            exit_series.at[trade['exit_time']] = trade['exit_price']
 
-        plt.title(f"Backtest FVG - {self.symbol}")
-        plt.xlabel("Czas")
-        plt.ylabel("Cena")
-        plt.legend()
-        plt.grid(True)
-        plt.tight_layout()
-        plt.show()
+        apds = [
+            mpf.make_addplot(entry_series, type='scatter', markersize=100, marker='^', color='g'),
+            mpf.make_addplot(exit_series, type='scatter', markersize=100, marker='v', color='r')
+        ]
 
+        mpf.plot(df_plot, type='candle', style='charles', title=f"Backtest FVG - {self.symbol}",
+                 ylabel='Cena', volume=False, addplot=apds)
 
     def run(self):
-        """
-        Uruchomienie strategii
-        :return:
-        """
         self.get_data()
         self.detect_fvg()
         signals = self.check_price_return()
         return signals
-
 
 if __name__ == "__main__":
     strategy = FVGStrategy(symbol='ETHUSDT', interval='1m')

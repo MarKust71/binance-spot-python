@@ -19,7 +19,8 @@ def determine_trade_outcome(trade, price):
     # }
 
     # TD: make depend on a param
-    trailing_stop_loss_basis = TP_SL / 2
+    trailing_stop_loss_basis = TP_SL
+    # trailing_stop_loss_basis = TP_SL / 2
     # trailing_stop_loss_basis = candle_data["atr"]
 
     is_buy_factor = 1 if trade.side == Side.BUY else -1

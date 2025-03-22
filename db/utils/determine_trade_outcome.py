@@ -34,7 +34,10 @@ def determine_trade_outcome(trade, price):
         quantity = trade.rest_quantity
         profit = calculate_profit(quantity, price, trade.price, is_buy_factor)
     elif trade.status == TradeStatus.SAFE:
-        stop_loss_estimated = round(price - trailing_stop_loss_basis * 2 * is_buy_factor, 2)
+        if (price - trade.stop_loss) * is_buy_factor >= 0:
+            stop_loss_estimated = round(price - trailing_stop_loss_basis * 1 * is_buy_factor, 2)
+        else:
+            stop_loss_estimated = round(price - trailing_stop_loss_basis * 2 * is_buy_factor, 2)
         if (trade.stop_loss - stop_loss_estimated) * is_buy_factor < 0:
             reason = Reason.UPDATE_STOP_LOSS
             stop_loss_new = stop_loss_estimated

@@ -2,10 +2,9 @@
 """
 Strategy tester module.
 """
-
-
 from constants import TRADE_SYMBOL, KLINE_INTERVAL, KLINE_TREND_INTERVAL
 from db.utils import db_update_trades, db_add_trade
+from db.repositories import TradeRepository
 from helpers import fetch_candles
 
 LIMIT = 1000
@@ -56,8 +55,17 @@ def strategy_tester():
         )
 
 
+
+
 if __name__ == '__main__':
     strategy_tester()
+
+    trades_repo = TradeRepository()
+    trades_repo.report_results()
+    trades_repo.close()
+
+
+
 
     # trades_repo = TradeRepository()
     #

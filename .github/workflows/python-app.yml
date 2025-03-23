@@ -44,6 +44,9 @@ jobs:
         API_KEY: ${{ secrets.API_KEY }}
         API_SECRET: ${{ secrets.API_SECRET }}
         TESTNET: ${{ secrets.TESTNET }}
-        FORCE_TAKE_PROFIT: ${{ secrets.FORCE_TAKE_PROFIT }}
+        APPLY_TAKE_PROFIT: ${{ secrets.APPLY_TAKE_PROFIT }}
+        APPLY_TAKE_PROFIT_SAFE: ${{ secrets.APPLY_TAKE_PROFIT_SAFE }}
+        TP_SL_FACTOR: ${{ secrets.TP_SL_FACTOR }}
+        TP_SL: ${{ secrets.TP_SL }}
       run: |
         pytest

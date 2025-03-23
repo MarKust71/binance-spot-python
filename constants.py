@@ -7,8 +7,13 @@ import enum
 from binance import KLINE_INTERVAL_1MINUTE, KLINE_INTERVAL_5MINUTE
 from decouple import config
 
+
 API_WEBSOCKET_URL = config('API_WEBSOCKET_URL')
-FORCE_TAKE_PROFIT = bool(config('FORCE_TAKE_PROFIT') == 'True')
+APPLY_TAKE_PROFIT = bool(config('APPLY_TAKE_PROFIT') == 'True')
+APPLY_TAKE_PROFIT_SAFE = bool(config('APPLY_TAKE_PROFIT_SAFE') == 'True')
+
+TP_SL_FACTOR = float(config('TP_SL_FACTOR'))
+TP_SL = float(config('TP_SL'))
 
 RSI_PERIOD = 14
 RSI_OVERBOUGHT = 70

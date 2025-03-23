@@ -3,18 +3,19 @@ This module contains the TradeRepository class for managing trade operations in 
 """
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal
+from typing import List, Optional
 
 import pandas as pd
 
 from sqlalchemy import case
 from sqlalchemy.exc import SQLAlchemyError
 
-from constants import Side, TradeStatus
+from constants import (Side, TradeStatus, APPLY_TAKE_PROFIT, APPLY_TAKE_PROFIT_SAFE,
+                       TP_SL, TP_SL_FACTOR)
 from db.database import engine, SessionLocal
 from db.models.trade_model import Trade
-
-TP_SL_FACTOR = 3
-TP_SL = 5
+from db.utils.to_decimal import to_decimal
 
 
 @dataclass
@@ -38,6 +39,7 @@ class TradeRepository:
         """Inicjalizacja repozytorium"""
         self.engine = engine
         self.session = SessionLocal()
+        self.trades: List[Trade] = []
 
 
     def add_trade(self, trade_data: TradeData) -> int | None:
@@ -123,8 +125,10 @@ class TradeRepository:
         """
         Pobiera wszystkie transakcje z bazy danych.
         """
-        return self.session.query(Trade).all()
+        self.trades = self.session.query(Trade).all()
 
+        # return self.session.query(Trade).all()
+        return self.trades
 
     def get_trades_by_symbol(self, symbol: str):
         """
@@ -243,6 +247,65 @@ class TradeRepository:
             self.session.rollback()
 
 
+    def get_total_profit_by_status(self, status: Optional[TradeStatus] = None) -> Decimal('0.00'):
+        """
+        Zwraca sumę zysku transakcji spełniających warunki:
+        :param status:
+        :return:
+        """
+        return sum(
+            (to_decimal(trade.profit) for trade in self.trades
+             if status is None or trade.status == status),
+            Decimal('0.00')
+        )
+
+
+    def count_by_status_and_profit_sign(
+            self,
+            positive: bool = True,
+            status: Optional[TradeStatus] = None
+    ) -> int:
+        """
+        Zwraca liczbę transakcji spełniających warunki:
+        :param positive:
+        :param status:
+        :return:
+        """
+        if positive:
+            return sum(
+                1 for trade in self.trades
+                if (status is None or trade.status == status) and trade.profit >= 0
+            )
+
+        return sum(
+            1 for trade in self.trades
+            if (status is None or trade.status == status) and trade.profit < 0
+        )
+
+
+    def report_results(self):
+        """
+        Raportuje wyniki transakcji.
+        """
+        self.get_all_trades()
+        total_profit = self.get_total_profit_by_status(status=TradeStatus.CLOSED)
+        partial_profit = self.get_total_profit_by_status(status=TradeStatus.PARTIAL)
+        open_profit = self.get_total_profit_by_status(status=TradeStatus.OPEN)
+        profits = self.count_by_status_and_profit_sign(positive=True, status=TradeStatus.CLOSED)
+        loses = self.count_by_status_and_profit_sign(positive=False, status=TradeStatus.CLOSED)
+
+        print(f'Apply T/P: {APPLY_TAKE_PROFIT}, Apply T/P Safe: {APPLY_TAKE_PROFIT_SAFE}, '
+              f'TP/SL: {to_decimal(TP_SL_FACTOR)}')
+        print(f'Total profit: {total_profit}, profits: {profits}, loses: {loses}')
+        print(f'Partial profit: {partial_profit}, open profit: {open_profit}')
+
+
     def close(self):
         """Zamyka sesję"""
         self.session.close()
+
+
+if __name__ == '__main__':
+    trades_repo = TradeRepository()
+    trades_repo.report_results()
+    trades_repo.close()

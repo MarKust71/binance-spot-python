@@ -1,7 +1,7 @@
 """
 This module determines the outcome of a trade based on the given price.
 """
-from constants import Reason, Side, TradeStatus, FORCE_TAKE_PROFIT
+from constants import Reason, Side, TradeStatus, APPLY_TAKE_PROFIT, APPLY_TAKE_PROFIT_SAFE
 from db.repositories.trade_repository import TP_SL
 from db.utils.calculate_profit import calculate_profit
 
@@ -29,19 +29,18 @@ def determine_trade_outcome(trade, price):
         reason = Reason.STOP_LOSS
         quantity = trade.rest_quantity
         profit = calculate_profit(quantity, price, trade.price, is_buy_factor)
-    elif FORCE_TAKE_PROFIT and (price - trade.take_profit) * is_buy_factor >= 0:
+    elif APPLY_TAKE_PROFIT and (price - trade.take_profit) * is_buy_factor >= 0:
         reason = Reason.TAKE_PROFIT
         quantity = trade.rest_quantity
         profit = calculate_profit(quantity, price, trade.price, is_buy_factor)
-    elif trade.status == TradeStatus.SAFE:
-        if (price - trade.stop_loss) * is_buy_factor >= 0:
-            stop_loss_estimated = round(price - trailing_stop_loss_basis * 1 * is_buy_factor, 2)
-        else:
-            stop_loss_estimated = round(price - trailing_stop_loss_basis * 2 * is_buy_factor, 2)
+    elif APPLY_TAKE_PROFIT_SAFE and trade.status == TradeStatus.SAFE:
+        trailing_stop_loss_basis_factor = 1 if (price - trade.stop_loss) * is_buy_factor >= 0 else 2
+        stop_loss_estimated = round(
+            price - trailing_stop_loss_basis * trailing_stop_loss_basis_factor * is_buy_factor, 2)
         if (trade.stop_loss - stop_loss_estimated) * is_buy_factor < 0:
             reason = Reason.UPDATE_STOP_LOSS
             stop_loss_new = stop_loss_estimated
-    elif ((price - trade.take_profit_safe) * is_buy_factor >= 0
+    elif APPLY_TAKE_PROFIT_SAFE and ((price - trade.take_profit_safe) * is_buy_factor >= 0
           and trade.take_profit_safe_date_time is None
           and trade.take_profit_partial_date_time is not None):
         reason = Reason.TAKE_PROFIT_SAFE

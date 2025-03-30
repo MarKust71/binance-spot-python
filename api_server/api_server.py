@@ -151,7 +151,9 @@ def read_items(
     # Pobranie danych z uwzględnieniem offset i limit
     trades = trades_query.offset(skip).limit(limit).all()
 
-    total = db.query(Trade).count()
+    # total = db.query(Trade).count()
+    # total = db.query(Trade).filter(~Trade.status.in_(exclude_status)).count() if exclude_status else db.query(Trade).count()
+    total = trades_query.count()
 
     return {
         "data": [{

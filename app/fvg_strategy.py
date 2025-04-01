@@ -11,7 +11,7 @@ class FVGStrategy:
     """
     Strategia FVG (Falling Volume Growth)
     """
-    def __init__(self, symbol='ETHUSDT', interval='1m', limit=200):
+    def __init__(self, symbol='ETHUSDC', interval='1m', limit=200):
         """
         :param symbol:
         :param interval:
@@ -262,7 +262,7 @@ class FVGStrategy:
 
 
 if __name__ == "__main__":
-    strategy = FVGStrategy(symbol='ETHUSDT', interval='1m')
+    strategy = FVGStrategy(symbol='ETHUSDC', interval='1m')
     strategy.get_data()
     backtest = strategy.backtest()
     strategy.summarize_backtest()

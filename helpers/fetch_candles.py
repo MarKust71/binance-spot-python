@@ -60,7 +60,7 @@ if __name__ == '__main__':
     print(timestamp)
 
     try:
-        df = fetch_candles('ETHUSDT', '5m', 30, end_time=timestamp)
+        df = fetch_candles('ETHUSDC', '5m', 30, end_time=timestamp)
 
         if not df.empty:
             # Zapisywanie danych do pliku CSV

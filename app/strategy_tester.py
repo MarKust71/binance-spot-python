@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # trades_repo = TradeRepository()
     #
     # # Dodanie przykładowej transakcji
-    # trades_repo.add_trade(symbol="ETHUSDT", side=Side.BUY, price=3125.50, atr=8.8)
+    # trades_repo.add_trade(symbol="ETHUSDC", side=Side.BUY, price=3125.50, atr=8.8)
     #
     # # Pobranie i wyświetlenie transakcji
     # trades = trades_repo.get_all_trades()

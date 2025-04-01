@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # # Przykładowe dane do dodania
     # new_trade = Trades(
     #     date_time=datetime.now(),
-    #     symbol="ETHUSDT",          # Przykładowy symbol
+    #     symbol="ETHUSDC",          # Przykładowy symbol
     #     side=Side.BUY,             # Strona transakcji (BUY/SELL)
     #     price=3125.50,             # Przykładowa cena
     #     quantity=round(60 / 3125.50, 4),     # Przykładowa ilość

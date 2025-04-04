@@ -55,7 +55,7 @@ def handle_websocket_message(message) -> None:
         "open_price": candles['open'].to_numpy()[-1],
         "rsi": candles['rsi'].to_numpy()[-1],
         "atr": candles['atr'].to_numpy()[-1],
-        "close_time_utc": close_time_utc.floor('T'),
+        "close_time_utc": close_time_utc.floor('min'),
     }
 
     rsi_signals = get_rsi_signals(candles['rsi'].to_numpy())

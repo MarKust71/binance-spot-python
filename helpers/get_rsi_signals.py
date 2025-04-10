@@ -18,8 +18,10 @@ def get_rsi_signals(rsi: list) -> dict:
     rsi_signals = {
         "swing_high": rsi[-2] > rsi[-1] and rsi[-2] > rsi[-3],
         "swing_low": rsi[-2] < rsi[-1] and rsi[-2] < rsi[-3],
-        "signal_high": rsi[-2] > RSI_OVERBOUGHT,
-        "signal_low": rsi[-2] < RSI_OVERSOLD
+        # "signal_high": rsi[-2] > RSI_OVERBOUGHT,
+        # "signal_low": rsi[-2] < RSI_OVERSOLD
+        "signal_high": rsi[-2] > RSI_OVERBOUGHT >= rsi[-1],
+        "signal_low": rsi[-2] < RSI_OVERSOLD <= rsi[-1],
     }
 
     rsi_signals["swing"] = rsi_signals["swing_high"] or rsi_signals["swing_low"]
